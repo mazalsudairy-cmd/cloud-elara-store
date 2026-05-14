@@ -4,7 +4,10 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/api/client';
 import { Package, FolderOpen, TrendingUp, ShoppingCart } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { motion } from 'framer-motion';
 import { isMonthlyProduct } from '@/lib/productPricing';
+
+export default function Dashboard() {
   const { t, isRTL } = useLanguage();
 
   const { data: products } = useQuery({
