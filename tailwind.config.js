@@ -80,7 +80,9 @@ export default {
       fontFamily: {
         display: ['var(--font-display)', 'Georgia', 'serif'],
         arabic: ['var(--font-arabic)', 'system-ui', 'sans-serif'],
+        english: ['var(--font-english)', 'system-ui', 'sans-serif'],
         brandArabic: ['var(--font-arabic-brand)', 'Georgia', 'serif'],
+      },
       keyframes: {
         'accordion-down': {
           from: { height: '0' },
