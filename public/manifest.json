@@ -1,0 +1,10 @@
+{
+  "name": "Cloud Elara",
+  "short_name": "Elara",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0f1e",
+  "theme_color": "#0a0f1e",
+  "lang": "en",
+  "icons": []
+}
