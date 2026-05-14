@@ -46,14 +46,18 @@ git push -u origin main
 ```
 
 3. في [Vercel](https://vercel.com): **Add New Project** → استورد نفس المستودع من GitHub.
-4. إعدادات البناء: **Framework Preset = Vite**، الأمر `npm run build`، المخرجات **`dist`** (لا تغيّرها إلى `public`).
-5. إن ظهرت **شاشة بيضاء** أو `index.html` بحجم صفر في لوحة Vercel: من المشروع → **Deployments** → آخر نشر → **⋯** → **Redeploy** مع تفعيل **Clear build cache**.
+4. إعدادات البناء (مهم جداً):
+   - **Root Directory**: اتركه **`.`** (جذر المستودع) ما لم يكن المشروع داخل مجلد فرعي.
+   - **Framework Preset**: **Vite**
+   - **Build Command**: `npm run build`
+   - **Output Directory**: **`dist`** فقط — لا تستخدم `public` (إلا إذا كان المشروع فعلاً يبني إلى هناك؛ هذا المشروع يبني إلى `dist`).
+5. إن ظهرت **شاشة بيضاء** أو في ملخص النشر يظهر `index.html` بحجم صفر وبدون مجلد `assets`: غالباً **Output Directory** خاطئ أو الكاش؛ من **Deployments** → **⋯** → **Redeploy** مع **Clear build cache**، ثم راجع الخطوة 4.
 6. في Vercel → **Settings → Environment Variables** أضف على الأقل `VITE_ADMIN_PASSWORD` (وأي متغيرات من الجدول أعلاه).
 7. **Custom Domain**: من المشروع في Vercel → **Domains** وأضف الدومين، ثم عدّل DNS عند مسجّل الدومين كما تطلبك Vercel.
 
 للتحقق الاختياري بعد البناء (مثلاً قبل نشر يدوي): `npm run build:verify` — يشغّل **`scripts/verify-dist.mjs`** بعد `vite build`.
 
-**ملاحظة SPA:** تمت إزالة `vercel.json` لتفادي تعارض مع إخراج Vite الافتراضي على Vercel. تحديث الصفحة على مسار مثل `/admin` قد يعيد 404؛ إن احتجت دعم تحديث مباشر لجميع المسارات، أضف في Vercel من **Project → Settings → Redirects/Rewrites** أو أعد إضافة قاعدة rewrite آمنة بعد التأكد أن البناء يملأ `dist` بشكل صحيح.
+**SPA على Vercel:** يوجد في الجذر `vercel.json` بقاعدة rewrite الرسمية من [توثيق Vite على Vercel](https://vercel.com/docs/frameworks/frontend/vite) حتى يعمل تحديث الصفحة على مسارات مثل `/admin`. الملفات الثابتة (مثل `/assets/*` و`/manifest.json`) تُخدم قبل إعادة التوجيه.
 
 ## ما الذي استُبدل عن Base44؟
 
