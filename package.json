@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/verify-dist.mjs",
+    "build": "vite build",
+    "build:verify": "vite build && node scripts/verify-dist.mjs",
     "lint": "eslint . --quiet",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",

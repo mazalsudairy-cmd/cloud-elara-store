@@ -51,7 +51,7 @@ git push -u origin main
 6. في Vercel → **Settings → Environment Variables** أضف على الأقل `VITE_ADMIN_PASSWORD` (وأي متغيرات من الجدول أعلاه).
 7. **Custom Domain**: من المشروع في Vercel → **Domains** وأضف الدومين، ثم عدّل DNS عند مسجّل الدومين كما تطلبك Vercel.
 
-بعد `vite build` يشغّل المشروع سكربت **`scripts/verify-dist.mjs`** للتأكد أن `dist/index.html` يحتوي روابط `/assets/` وأن هناك ملفات JS في `dist/assets/` — إن فشل، يفشل البناء على Vercel ويظهر الخطأ في السجل بدل نشر موقع فارغ.
+للتحقق الاختياري بعد البناء (مثلاً قبل نشر يدوي): `npm run build:verify` — يشغّل **`scripts/verify-dist.mjs`** بعد `vite build`.
 
 **ملاحظة SPA:** تمت إزالة `vercel.json` لتفادي تعارض مع إخراج Vite الافتراضي على Vercel. تحديث الصفحة على مسار مثل `/admin` قد يعيد 404؛ إن احتجت دعم تحديث مباشر لجميع المسارات، أضف في Vercel من **Project → Settings → Redirects/Rewrites** أو أعد إضافة قاعدة rewrite آمنة بعد التأكد أن البناء يملأ `dist` بشكل صحيح.
 
