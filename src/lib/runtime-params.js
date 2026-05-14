@@ -1,6 +1,21 @@
 const isNode = typeof window === 'undefined';
-const windowObj = isNode ? { localStorage: new Map() } : window;
-const storage = windowObj.localStorage;
+
+function createMemoryStorage() {
+  const m = new Map();
+  return {
+    getItem(key) {
+      return m.has(key) ? m.get(key) : null;
+    },
+    setItem(key, val) {
+      m.set(key, String(val));
+    },
+    removeItem(key) {
+      m.delete(key);
+    },
+  };
+}
+
+const storage = isNode ? createMemoryStorage() : window.localStorage;
 
 const toSnakeCase = (str) => str.replace(/([A-Z])/g, '_$1').toLowerCase();
 
@@ -59,7 +74,7 @@ const getAppParams = () => {
       getAppParamValue('app_id', { defaultValue: import.meta.env.VITE_APP_ID || import.meta.env.VITE_BASE44_APP_ID }) ||
       'elara-local',
     token: getAppParamValue('access_token', { removeFromUrl: true }),
-    fromUrl: getAppParamValue('from_url', { defaultValue: window.location.href }),
+    fromUrl: getAppParamValue('from_url', { defaultValue: isNode ? '' : window.location.href }),
     functionsVersion:
       getAppParamValue('functions_version', {
         defaultValue: import.meta.env.VITE_FUNCTIONS_VERSION || import.meta.env.VITE_BASE44_FUNCTIONS_VERSION,
