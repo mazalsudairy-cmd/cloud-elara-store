@@ -5,6 +5,10 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
+const srcDir = path.join(projectRoot, 'src').replace(/\\/g, '/');
+
+// Match only `@/…` (jsconfig paths). A bare `'@': src` breaks scoped packages like `@tanstack/*`.
+const atSlash = /^@\//;
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -12,9 +16,7 @@ export default defineConfig({
   appType: 'spa',
   plugins: [react()],
   resolve: {
-    alias: {
-      '@': path.join(projectRoot, 'src'),
-    },
+    alias: [{ find: atSlash, replacement: `${srcDir}/` }],
   },
   build: {
     outDir: 'dist',
