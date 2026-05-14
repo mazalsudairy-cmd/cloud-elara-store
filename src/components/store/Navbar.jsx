@@ -25,9 +25,16 @@ export default function Navbar({ storeName }) {
   return (
     <nav className="sticky top-0 z-50 glass">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14">
+        <div className="flex items-center justify-between min-h-[3.75rem] py-1.5">
           <Link to="/" className="flex min-w-0 items-center gap-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/40 rounded-md">
-            <span className="text-xs font-display font-bold tracking-[0.3em] uppercase text-foreground/80 truncate">
+            <span
+              className={`truncate leading-tight ${
+                isRTL
+                  ? 'font-brandArabic text-2xl sm:text-[1.7rem] text-[#eae1c9] md:text-[1.95rem]'
+                  : 'text-[11px] sm:text-xs font-display font-bold tracking-[0.28em] uppercase text-foreground/80'
+              }`}
+              style={isRTL ? { textShadow: '0 1px 18px rgba(201,168,76,0.22)', fontWeight: 400 } : undefined}
+            >
               {storeName || (isRTL ? 'كلاود إلارا' : 'Cloud Elara')}
             </span>
           </Link>

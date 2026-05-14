@@ -1,4 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Noto+Kufi+Arabic:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Katibeh&family=Noto+Kufi+Arabic:wght@300;400;500;600;700;800&display=swap');
+
+/*
+ * Optional — use “Ink Brush Arabic” (commercial): add WOFF2 to /public/fonts/ then uncomment:
+ *
+ * @font-face {
+ *   font-family: 'Ink Brush Arabic';
+ *   src: url('/fonts/InkBrushArabic.woff2') format('woff2');
+ *   font-weight: normal;
+ *   font-display: swap;
+ * }
+ *
+ * …and in :root set: --font-arabic-brand: 'Ink Brush Arabic', 'Katibeh', serif;
+ */
 
 @tailwind base;
 @tailwind components;
@@ -7,6 +20,8 @@
 /* ─── Design tokens — matched to Base44 build (elarastore.base44.app) ── */
 @layer base {
   :root {
+    /* Arabic “logo” stroke: Katibeh ≈ expressive display; swap to licensed Ink Brush by adding @font-face + --font-arabic-brand below */
+    --font-arabic-brand: 'Katibeh', 'Noto Kufi Arabic', serif;
     --font-arabic: 'Noto Kufi Arabic', system-ui, sans-serif;
     --font-english: 'Inter', system-ui, sans-serif;
     --font-display: 'Cinzel', Georgia, serif;

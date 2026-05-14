@@ -1,4 +1,4 @@
-import { getInitialDb } from '@/api/seedData';
+import { getInitialDb, ELARA_CATALOG_VERSION } from '@/api/seedData';
 
 const STORAGE_KEY = 'elara_local_db_v1';
 
@@ -33,6 +33,13 @@ function ensureDb() {
   let db = safeRead();
   if (!db || typeof db !== 'object') {
     db = getInitialDb();
+    write(db);
+    db = safeRead();
+  } else if (db._catalog_version !== ELARA_CATALOG_VERSION) {
+    const seed = getInitialDb();
+    db.Product = seed.Product;
+    db.Category = seed.Category;
+    db._catalog_version = ELARA_CATALOG_VERSION;
     write(db);
     db = safeRead();
   }

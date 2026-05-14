@@ -1,5 +1,8 @@
 const now = () => new Date().toISOString();
 
+/** Bump when replacing default Product + Category catalogs (local DB migrates via localEntityStore). */
+export const ELARA_CATALOG_VERSION = 3;
+
 function cat(id, nameAr, nameEn, sort) {
   return {
     id,
@@ -167,11 +170,10 @@ export function getInitialDb() {
       id: 'settings-1',
       store_name_ar: 'كلاود إلارا',
       store_name_en: 'Cloud Elara',
-      hero_title_ar: 'حلول Discord وبث وأداء',
-      hero_title_en: 'Discord, streaming & performance',
-      hero_subtitle_ar: 'قوالب سيرفرات، باقات بوتات، إعداد بث، ودلائل PC — مع خدمات تركيب واشتراك شهري.',
-      hero_subtitle_en:
-        'Server templates, bot bundles, streaming packs, legit PC guides—plus setup services and monthly care.',
+      hero_title_ar: 'منتجات مميزة بأسعار تناسبك',
+      hero_title_en: 'Featured picks at fair prices',
+      hero_subtitle_ar: '',
+      hero_subtitle_en: '',
       hero_image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&q=80',
       logo_url: '',
       currency: 'SAR',
@@ -207,6 +209,7 @@ export function getInitialDb() {
   ];
 
   return {
+    _catalog_version: ELARA_CATALOG_VERSION,
     Product: products,
     Category: categories,
     Order: [],

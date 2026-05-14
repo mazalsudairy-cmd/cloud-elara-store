@@ -26,14 +26,6 @@ const stars = Array.from({ length: 35 }, (_, i) => ({
 export default function HeroSection({ settings }) {
   const { t, isRTL } = useLanguage();
 
-  const title = isRTL
-    ? 'Discord، بث، وأداء عالي لمشروعك التالي'
-    : 'Discord, streaming & high-performance for your next build';
-
-  const subtitle = isRTL
-    ? 'قوالب سيرفرات، باقات بوتات، حزم إعداد بث، دلائل تحسين PC، خدمات تركيب، واشتراك شهري تقني.'
-    : 'Server templates, bot bundles, streaming setup packs, PC optimization guides, hands-on setup, and monthly technical care.';
-
   return (
     <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-navy">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -61,36 +53,37 @@ export default function HeroSection({ settings }) {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28 w-full">
         <div className={`max-w-2xl ${isRTL ? 'mr-0' : ''}`}>
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-3 mb-8"
+            transition={{ duration: 0.55 }}
+            className="mb-6"
           >
-            <div className="h-px w-6 bg-gold/60" />
-            <span className="text-gold/70 text-xs font-display tracking-[0.35em] uppercase">
-              {isRTL ? 'كلاود إلارا' : 'Cloud Elara'}
-            </span>
-            <div className="h-px w-6 bg-gold/60" />
+            {isRTL ? (
+              <p
+                dir="rtl"
+                className="font-brandArabic inline-block max-w-[100%] text-5xl sm:text-6xl md:text-[4.75rem] leading-[1.05] tracking-wide text-[#f2e8c8]"
+                style={{
+                  textShadow: '0 2px 40px rgba(201,168,76,0.35), 0 1px 0 rgba(255,248,225,0.12)',
+                  fontWeight: 400,
+                }}
+              >
+                كلاود إلارا
+              </p>
+            ) : (
+              <p className="font-display text-4xl sm:text-5xl md:text-[3.5rem] tracking-[0.28em] font-bold uppercase text-[#f0e4c0] drop-shadow-[0_2px_28px_rgba(201,168,76,0.2)]">
+                Cloud Elara
+              </p>
+            )}
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-            className={`text-4xl md:text-6xl font-bold leading-tight mb-6 ${isRTL ? 'font-arabic text-5xl md:text-7xl' : 'font-display'}`}
-            style={{ color: '#f0e4c0' }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className={`mb-12 text-[1.35rem] sm:text-2xl md:text-3xl font-semibold leading-snug text-foreground/88 ${isRTL ? 'font-arabic' : 'font-display tracking-wide text-foreground/80'}`}
           >
-            {title}
+            {isRTL ? 'منتجات مميزة بأسعار تناسبك' : 'Featured products at prices that work for you'}
           </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className={`text-base md:text-lg text-foreground/50 mb-10 leading-relaxed max-w-xl ${isRTL ? 'font-arabic' : 'font-english'}`}
-          >
-            {subtitle}
-          </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 16 }}

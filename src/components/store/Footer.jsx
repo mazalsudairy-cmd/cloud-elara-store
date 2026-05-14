@@ -15,7 +15,14 @@ export default function Footer({ storeName }) {
         <div className="grid grid-cols-1 gap-10 md:grid-cols-4 md:gap-10">
           {/* Brand */}
           <div className="md:col-span-2">
-            <h3 className="mb-3 font-display text-xl font-bold tracking-widest text-foreground/90">
+            <h3
+              className={`mb-3 ${
+                isRTL
+                  ? 'font-brandArabic text-3xl md:text-[2.65rem] text-[#eae1c9]'
+                  : 'font-display text-xl font-bold tracking-widest text-foreground/90'
+              }`}
+              style={isRTL ? { fontWeight: 400, textShadow: '0 2px 24px rgba(201,168,76,0.2)' } : undefined}
+            >
               {brand}
             </h3>
             <p className={`max-w-md text-xs leading-relaxed text-foreground/40 ${isRTL ? 'font-arabic' : 'font-english'}`}>
