@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import ImageUploader from '@/components/admin/ImageUploader';
+import { isMonthlyProduct } from '@/lib/productPricing';
 import { Plus, Pencil, Trash2, Package } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -54,6 +55,7 @@ export default function AdminProducts() {
       name_ar: '', name_en: '', description_ar: '', description_en: '',
       price: '', compare_price: '', category_id: '', status: 'active',
       featured: false, stock: 0, images: [], sort_order: 0,
+      price_period: 'one_time',
     });
     setDialogOpen(true);
   };
@@ -75,6 +77,7 @@ export default function AdminProducts() {
     if (data.compare_price) data.compare_price = Number(data.compare_price);
     if (data.stock) data.stock = Number(data.stock);
     if (data.sort_order) data.sort_order = Number(data.sort_order);
+    data.price_period = data.price_period === 'month' ? 'month' : 'one_time';
     delete data.id;
     delete data.created_date;
     delete data.updated_date;
@@ -109,7 +112,10 @@ export default function AdminProducts() {
               <p className={`font-medium truncate ${isRTL ? 'font-arabic' : 'font-english'}`}>
                 {localized(p, 'name')}
               </p>
-              <p className="text-sm text-accent font-bold">{p.price} {t('sar')}</p>
+              <p className={`text-sm text-accent font-bold font-english`}>
+                {p.price} {t('sar')}
+                {isMonthlyProduct(p) ? ` ${t('perMonthSuffix')}` : ''}
+              </p>
             </div>
             <span className={`hidden sm:block text-xs px-2 py-1 rounded-full ${
               p.status === 'active' ? 'bg-green-100 text-green-700' :
@@ -208,6 +214,21 @@ export default function AdminProducts() {
                 <div>
                   <Label>{t('sortOrder')}</Label>
                   <Input type="number" value={editing.sort_order} onChange={(e) => setEditing({ ...editing, sort_order: e.target.value })} className="mt-1" />
+                </div>
+                <div className="col-span-2 md:col-span-4">
+                  <Label>{t('pricePeriod')}</Label>
+                  <Select
+                    value={editing.price_period || 'one_time'}
+                    onValueChange={(v) => setEditing({ ...editing, price_period: v })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="one_time">{t('pricePeriodOnce')}</SelectItem>
+                      <SelectItem value="month">{t('pricePeriodMonth')}</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 

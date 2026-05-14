@@ -5,6 +5,7 @@ import { useCart } from '@/lib/cartStore';
 import { ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import ProductPrice from '@/components/store/ProductPrice';
 
 export default function ProductCard({ product }) {
   const { t, isRTL, localized } = useLanguage();
@@ -79,9 +80,7 @@ export default function ProductCard({ product }) {
               {name}
             </h3>
             <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-gold font-english">
-                {product.price} <span className={`text-sm text-gold/60 ${isRTL ? 'font-arabic' : ''}`}>{t('sar')}</span>
-              </span>
+              <ProductPrice product={product} className="text-lg" />
               {hasDiscount && (
                 <span className="text-xs text-muted-foreground line-through font-english">
                   {product.compare_price}

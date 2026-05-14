@@ -1,11 +1,12 @@
 import React, { useRef } from 'react';
 import { useLanguage } from '@/lib/i18n';
+import { isMonthlyProduct } from '@/lib/productPricing';
 import { X, Printer } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 
 export default function OrderInvoice({ order, onClose }) {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const printRef = useRef();
 
   const handlePrint = () => {
@@ -151,10 +152,12 @@ export default function OrderInvoice({ order, onClose }) {
                   <td style={{ padding: '10px 12px', fontSize: '13px', color: '#333' }}>
                     {isRTL ? (item.product_name_ar || item.product_name_en) : (item.product_name_en || item.product_name_ar)}
                   </td>
-                  <td style={{ padding: '10px 12px', fontSize: '13px', color: '#555' }}>{item.price} SAR</td>
+                  <td style={{ padding: '10px 12px', fontSize: '13px', color: '#555' }}>
+                    {item.price} SAR{isMonthlyProduct(item) ? ` ${t('perMonthSuffix')}` : ''}
+                  </td>
                   <td style={{ padding: '10px 12px', fontSize: '13px', color: '#555' }}>{item.quantity}</td>
                   <td style={{ padding: '10px 12px', fontSize: '13px', fontWeight: '600', color: '#111' }}>
-                    {(item.price * item.quantity).toFixed(0)} SAR
+                    {(item.price * item.quantity).toFixed(0)} SAR{isMonthlyProduct(item) ? ` ${t('perMonthSuffix')}` : ''}
                   </td>
                 </tr>
               ))}

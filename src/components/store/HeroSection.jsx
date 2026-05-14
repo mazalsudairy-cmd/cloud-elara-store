@@ -27,12 +27,12 @@ export default function HeroSection({ settings }) {
   const { t, isRTL } = useLanguage();
 
   const title = isRTL
-    ? 'منتجات رقمية مميزة، مختارة بعناية'
-    : 'Premium Digital Products, Curated with Precision';
+    ? 'Discord، بث، وأداء عالي لمشروعك التالي'
+    : 'Discord, streaming & high-performance for your next build';
 
   const subtitle = isRTL
-    ? 'اكتشف منتجات رقمية وحلول مخصصة صُممت بجودة عالية وتجربة احترافية تجمع بين الأناقة والكفاءة.'
-    : 'Discover refined digital products and custom-crafted solutions designed with quality, performance, and elegance in mind.';
+    ? 'قوالب سيرفرات، باقات بوتات، حزم إعداد بث، دلائل تحسين PC، خدمات تركيب، واشتراك شهري تقني.'
+    : 'Server templates, bot bundles, streaming setup packs, PC optimization guides, hands-on setup, and monthly technical care.';
 
   return (
     <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-navy">

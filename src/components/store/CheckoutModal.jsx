@@ -3,6 +3,7 @@ import { useLanguage } from '@/lib/i18n';
 import { useCart } from '@/lib/cartStore';
 import { api } from '@/api/client';
 import { X, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
+import { isMonthlyProduct } from '@/lib/productPricing';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -193,6 +194,7 @@ export default function CheckoutModal({ onClose }) {
       product_name_en: i.product.name_en || '',
       price: i.product.price,
       quantity: i.quantity,
+      price_period: i.product.price_period || 'one_time',
     }));
 
     await api.entities.Order.create({
@@ -353,7 +355,10 @@ export default function CheckoutModal({ onClose }) {
                     <span className={isRTL ? 'font-arabic' : 'font-english'}>
                       {localized(item.product, 'name')} × {item.quantity}
                     </span>
-                    <span className="font-english">{(item.product.price * item.quantity).toFixed(0)} SAR</span>
+                    <span className="font-english">
+                      {(item.product.price * item.quantity).toFixed(0)} SAR
+                      {isMonthlyProduct(item.product) ? ` ${t('perMonthSuffix')}` : ''}
+                    </span>
                   </div>
                 ))}
                 <div className="flex justify-between border-t border-white/8 pt-2">

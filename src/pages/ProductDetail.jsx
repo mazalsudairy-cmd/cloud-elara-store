@@ -5,6 +5,8 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/api/client';
 import { Link } from 'react-router-dom';
 import ProductCard from '@/components/store/ProductCard';
+import ProductPrice from '@/components/store/ProductPrice';
+import { isMonthlyProduct } from '@/lib/productPricing';
 import { ShoppingBag, Minus, Plus, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
@@ -49,6 +51,7 @@ export default function ProductDetail() {
   const hasDiscount = product.compare_price && product.compare_price > product.price;
   const discountPct = hasDiscount ? Math.round((1 - product.price / product.compare_price) * 100) : 0;
   const related = relatedProducts.filter(p => p.id !== product.id).slice(0, 4);
+  const monthly = isMonthlyProduct(product);
 
   const handleAdd = () => {
     addItem(product, qty);
@@ -102,14 +105,19 @@ export default function ProductDetail() {
           </h1>
           <div className="gold-divider mb-6" />
 
-          <div className="flex items-baseline gap-4 mb-6">
-            <span className="text-3xl font-bold text-gold font-english">
-              {product.price}
-              <span className={`text-base text-gold/60 ms-1 ${isRTL ? 'font-arabic' : 'font-english'}`}>{t('sar')}</span>
-            </span>
+          <div className="flex items-baseline gap-4 mb-6 flex-wrap">
+            <ProductPrice product={product} className="text-3xl" />
             {hasDiscount && (
               <>
-                <span className="text-lg text-muted-foreground line-through font-english">{product.compare_price}</span>
+                <span className="text-lg text-muted-foreground line-through font-english">
+                  {product.compare_price}
+                  <span className={`text-sm text-muted-foreground/80 ms-1 ${isRTL ? 'font-arabic' : ''}`}>{t('sar')}</span>
+                  {monthly && (
+                    <span className={`text-xs text-muted-foreground/80 ms-1 ${isRTL ? 'font-arabic' : 'font-english'}`}>
+                      {t('perMonthSuffix')}
+                    </span>
+                  )}
+                </span>
                 <span className="bg-destructive/15 text-destructive text-xs font-bold px-2 py-1 rounded-full">-{discountPct}%</span>
               </>
             )}

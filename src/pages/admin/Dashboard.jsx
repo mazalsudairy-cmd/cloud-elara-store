@@ -4,9 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/api/client';
 import { Package, FolderOpen, TrendingUp, ShoppingCart } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { motion } from 'framer-motion';
-
-export default function Dashboard() {
+import { isMonthlyProduct } from '@/lib/productPricing';
   const { t, isRTL } = useLanguage();
 
   const { data: products } = useQuery({
@@ -110,7 +108,10 @@ export default function Dashboard() {
                 <p className={`font-medium truncate ${isRTL ? 'font-arabic' : 'font-english'}`}>
                   {isRTL ? p.name_ar : (p.name_en || p.name_ar)}
                 </p>
-                <p className="text-sm text-muted-foreground">{p.price} {t('sar')}</p>
+                <p className="text-sm text-muted-foreground">
+                  {p.price} {t('sar')}
+                  {isMonthlyProduct(p) ? ` ${t('perMonthSuffix')}` : ''}
+                </p>
               </div>
               <span className={`text-xs px-2 py-1 rounded-full ${
                 p.status === 'active' ? 'bg-green-100 text-green-700' :

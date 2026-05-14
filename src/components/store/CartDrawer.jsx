@@ -5,6 +5,7 @@ import { X, Plus, Minus, ShoppingBag, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import CheckoutModal from './CheckoutModal';
+import ProductPrice from '@/components/store/ProductPrice';
 
 export default function CartDrawer() {
   const { items, removeItem, updateQuantity, totalPrice, isOpen, setIsOpen } = useCart();
@@ -70,9 +71,9 @@ export default function CartDrawer() {
                           <h3 className={`font-medium text-sm truncate text-foreground/90 ${isRTL ? 'font-arabic' : 'font-english'}`}>
                             {localized(item.product, 'name')}
                           </h3>
-                          <p className="text-gold font-bold text-sm mt-1 font-english">
-                            {item.product.price} {t('sar')}
-                          </p>
+                          <div className="mt-1">
+                            <ProductPrice product={item.product} className="text-sm" />
+                          </div>
                           <div className="flex items-center gap-2 mt-2">
                             <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="p-1 rounded-md hover:bg-gold/10 text-gold/70 hover:text-gold transition-colors">
                               <Minus className="w-3 h-3" />
