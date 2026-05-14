@@ -4,7 +4,7 @@ import { useLanguage } from '@/lib/i18n';
 import LanguageToggle from '@/components/store/LanguageToggle';
 import {
   LayoutDashboard, Package, FolderOpen, Settings, Store, Menu,
-  ChevronLeft, ChevronRight, CreditCard, ShoppingCart
+  ChevronLeft, ChevronRight, CreditCard, ShoppingCart, Users
 } from 'lucide-react';
 
 const navItems = [
@@ -12,6 +12,7 @@ const navItems = [
   { key: 'orders', path: '/admin/orders', icon: ShoppingCart, labelAr: 'الطلبات', labelEn: 'Orders' },
   { key: 'manageProducts', path: '/admin/products', icon: Package },
   { key: 'manageCategories', path: '/admin/categories', icon: FolderOpen },
+  { key: 'manageUsers', path: '/admin/users', icon: Users },
   { key: 'payment', path: '/admin/payment', icon: CreditCard, labelAr: 'الدفع', labelEn: 'Payment' },
   { key: 'storeSettings', path: '/admin/settings', icon: Settings },
 ];

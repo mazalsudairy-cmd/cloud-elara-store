@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { api } from '@/api/client';
 import { appParams } from '@/lib/runtime-params';
+import { ensureAuthBootstrap } from '@/api/bootstrapAuth';
 
 const AuthContext = createContext();
 
@@ -43,6 +44,7 @@ export const AuthProvider = ({ children }) => {
   const checkUserAuth = async () => {
     try {
       setIsLoadingAuth(true);
+      await ensureAuthBootstrap();
       const currentUser = await api.auth.me();
       if (currentUser) {
         setUser(currentUser);

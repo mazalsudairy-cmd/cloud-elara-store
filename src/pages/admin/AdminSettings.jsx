@@ -11,6 +11,65 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ImageUploader from '@/components/admin/ImageUploader';
 import { toast } from 'sonner';
 import { Save } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+
+function SecurityCard() {
+  const { t, isRTL } = useLanguage();
+  const qc = useQueryClient();
+  const { data: cfg, isFetching } = useQuery({
+    queryKey: ['authConfig-admin'],
+    queryFn: () => api.auth.getAuthConfig(),
+  });
+  const [otp, setOtp] = useState(false);
+  const [helpAr, setHelpAr] = useState('');
+  const [helpEn, setHelpEn] = useState('');
+  useEffect(() => {
+    if (!cfg) return;
+    setOtp(!!cfg.otp_recovery_enabled);
+    setHelpAr(cfg.forgot_email_help_ar || '');
+    setHelpEn(cfg.forgot_email_help_en || '');
+  }, [cfg]);
+  const saveMut = useMutation({
+    mutationFn: () =>
+      api.auth.updateAuthConfig({
+        otp_recovery_enabled: otp,
+        forgot_email_help_ar: helpAr,
+        forgot_email_help_en: helpEn,
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['authConfig-admin'] });
+      qc.invalidateQueries({ queryKey: ['authConfig-public'] });
+      toast.success(t('save'));
+    },
+    onError: () => toast.error(isRTL ? 'فشل الحفظ' : 'Save failed'),
+  });
+  return (
+    <Card>
+      <CardHeader><CardTitle className={isRTL ? 'font-arabic' : 'font-english'}>{t('securityAuth')}</CardTitle></CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <Label className="text-base">{t('otpRecoveryLabel')}</Label>
+            <p className={`mt-1 text-xs text-muted-foreground ${isRTL ? 'font-arabic text-right sm:text-start' : 'font-english'}`}>{t('otpRecoveryHint')}</p>
+          </div>
+          <Switch checked={otp} onCheckedChange={setOtp} aria-label={t('otpRecoveryLabel')} />
+        </div>
+        <div>
+          <Label className="font-arabic">{t('forgotEmailHelpAr')}</Label>
+          <Textarea dir="rtl" rows={4} value={helpAr} onChange={(e) => setHelpAr(e.target.value)} className="mt-1 font-arabic" placeholder="تواصل معنا على…" />
+        </div>
+        <div>
+          <Label className="font-english">{t('forgotEmailHelpEn')}</Label>
+          <Textarea dir="ltr" rows={4} value={helpEn} onChange={(e) => setHelpEn(e.target.value)} className="mt-1 font-english" placeholder="Contact us at…" />
+        </div>
+        <Button type="button" onClick={() => saveMut.mutate()} disabled={saveMut.isPending || isFetching} className="gap-2 bg-accent">
+          <Save className="h-4 w-4" />
+          {isRTL ? 'حفظ الأمان' : 'Save security'}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function AdminSettings() {
   const { t, isRTL } = useLanguage();
@@ -31,7 +90,7 @@ export default function AdminSettings() {
     } else if (!existingSettings && !form) {
       setForm({
         store_name_ar: 'متجري',
-        store_name_en: 'My Store',
+        store_name_en: 'Cloud Elara',
         hero_title_ar: 'اكتشف مجموعتنا المميزة',
         hero_title_en: 'Discover Our Collection',
         hero_subtitle_ar: 'تشكيلة منسقة من أجود المنتجات',
@@ -158,6 +217,9 @@ export default function AdminSettings() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Security / Auth (OTP, forgot-email copy) */}
+        <SecurityCard />
       </div>
     </div>
   );

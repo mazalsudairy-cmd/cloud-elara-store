@@ -2,20 +2,30 @@ import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { api } from '@/api/client';
 import { Outlet } from 'react-router-dom';
+import { ensureAuthBootstrap } from '@/api/bootstrapAuth';
 
 export default function AdminGuard() {
   const [status, setStatus] = useState('loading'); // loading | allowed | denied
 
   useEffect(() => {
-    api.auth.me()
-      .then(user => {
+    let cancelled = false;
+    (async () => {
+      try {
+        await ensureAuthBootstrap();
+        const user = await api.auth.me();
+        if (cancelled) return;
         if (user && user.role === 'admin') {
           setStatus('allowed');
         } else {
           setStatus('denied');
         }
-      })
-      .catch(() => setStatus('denied'));
+      } catch {
+        if (!cancelled) setStatus('denied');
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   if (status === 'loading') {

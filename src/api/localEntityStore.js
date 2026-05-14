@@ -2,6 +2,19 @@ import { getInitialDb } from '@/api/seedData';
 
 const STORAGE_KEY = 'elara_local_db_v1';
 
+const REQUIRED_COLLECTIONS = ['User', 'AuthConfig', 'PasswordResetToken'];
+
+function ensureCollections(db) {
+  let changed = false;
+  for (const c of REQUIRED_COLLECTIONS) {
+    if (!Array.isArray(db[c])) {
+      db[c] = [];
+      changed = true;
+    }
+  }
+  return changed;
+}
+
 function safeRead() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -21,7 +34,9 @@ function ensureDb() {
   if (!db || typeof db !== 'object') {
     db = getInitialDb();
     write(db);
+    db = safeRead();
   }
+  if (ensureCollections(db)) write(db);
   return db;
 }
 

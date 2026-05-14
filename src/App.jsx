@@ -26,6 +26,11 @@ import AdminPayment from '@/pages/admin/AdminPayment';
 import AdminOrders from '@/pages/admin/AdminOrders';
 import AdminGuard from '@/components/admin/AdminGuard';
 import AdminLogin from '@/pages/AdminLogin';
+import CustomerLogin from '@/pages/auth/CustomerLogin';
+import RegisterPage from '@/pages/auth/RegisterPage';
+import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage';
+import AccountHelpPage from '@/pages/auth/AccountHelpPage';
+import AdminUsers from '@/pages/admin/AdminUsers';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -50,6 +55,10 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/login" element={<CustomerLogin />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/account-help" element={<AccountHelpPage />} />
 
       {/* Store routes */}
       <Route element={<StoreLayout />}>
@@ -68,6 +77,7 @@ const AuthenticatedApp = () => {
           <Route path="/admin/settings" element={<AdminSettings />} />
           <Route path="/admin/payment" element={<AdminPayment />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
         </Route>
       </Route>
 

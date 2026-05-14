@@ -1,4 +1,5 @@
 import { createEntityApi } from '@/api/localEntityStore';
+import { authMethods } from '@/api/authService';
 
 const entities = {
   Product: createEntityApi('Product'),
@@ -6,42 +7,13 @@ const entities = {
   Order: createEntityApi('Order'),
   StoreSettings: createEntityApi('StoreSettings'),
   PaymentSettings: createEntityApi('PaymentSettings'),
+  User: createEntityApi('User'),
+  AuthConfig: createEntityApi('AuthConfig'),
+  PasswordResetToken: createEntityApi('PasswordResetToken'),
 };
 
-const USER_KEY = 'elara_user';
-
-async function readUser() {
-  try {
-    const raw = localStorage.getItem(USER_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
-}
-
 export const auth = {
-  async me() {
-    return readUser();
-  },
-
-  logout(redirectUrl) {
-    localStorage.removeItem(USER_KEY);
-    localStorage.removeItem('token');
-    localStorage.removeItem('elara_access_token');
-    if (redirectUrl) {
-      window.location.assign(redirectUrl);
-    }
-  },
-
-  redirectToLogin(returnUrl) {
-    const base = import.meta.env.VITE_LOGIN_PATH || '/admin/login';
-    const url = new URL(base, window.location.origin);
-    if (returnUrl) {
-      url.searchParams.set('return', returnUrl);
-    }
-    window.location.assign(url.pathname + url.search);
-  },
+  ...authMethods,
 };
 
 export const integrations = {

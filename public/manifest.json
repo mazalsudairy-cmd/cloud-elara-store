@@ -1,7 +1,7 @@
 {
   "name": "Cloud Elara",
   "short_name": "Cloud Elara",
-  "description": "Cloud Elara — Symphony Market storefront",
+  "description": "Cloud Elara — digital storefront",
   "start_url": "/",
   "display": "standalone",
   "theme_color": "#0a0f1e",

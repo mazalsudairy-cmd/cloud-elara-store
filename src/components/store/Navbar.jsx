@@ -1,22 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { useCart } from '@/lib/cartStore';
 import LanguageToggle from './LanguageToggle';
 import { ShoppingBag, Menu, X, LayoutDashboard, LogIn, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { api } from '@/api/client';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function Navbar({ storeName }) {
   const { t, isRTL } = useLanguage();
   const { totalItems, setIsOpen } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  const { user, logout } = useAuth();
   const location = useLocation();
 
-  useEffect(() => {
-    api.auth.me().then(setUser).catch(() => setUser(null));
-  }, []);
+  const loginHref = `/login?return=${encodeURIComponent(`${location.pathname}${location.search}${location.hash}`)}`;
 
   const navLinks = [
     { path: '/', label: t('home') },
@@ -30,7 +28,7 @@ export default function Navbar({ storeName }) {
         <div className="flex items-center justify-between h-14">
           <Link to="/" className="flex min-w-0 items-center gap-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/40 rounded-md">
             <span className="text-xs font-display font-bold tracking-[0.3em] uppercase text-foreground/80 truncate">
-              {storeName || (isRTL ? 'كلاود إلارا' : 'CLOUD ELARA')}
+              {storeName || (isRTL ? 'كلاود إلارا' : 'Cloud Elara')}
             </span>
           </Link>
 
@@ -63,21 +61,20 @@ export default function Navbar({ storeName }) {
             {user ? (
               <button
                 type="button"
-                onClick={() => api.auth.logout('/')}
+                onClick={() => logout(true)}
                 className="hidden md:flex items-center gap-1.5 p-2 text-foreground/30 hover:text-foreground/70 transition-colors rounded-lg text-xs"
                 title={user.email}
               >
                 <LogOut className="w-3.5 h-3.5" />
               </button>
             ) : (
-              <button
-                type="button"
-                onClick={() => api.auth.redirectToLogin(window.location.href)}
+              <Link
+                to={loginHref}
                 className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gold/20 text-gold/60 hover:border-gold/40 hover:text-gold rounded-lg transition-colors font-english`}
               >
                 <LogIn className="w-3.5 h-3.5" />
                 <span>{isRTL ? 'دخول' : 'Login'}</span>
-              </button>
+              </Link>
             )}
 
             <button
@@ -132,13 +129,33 @@ export default function Navbar({ storeName }) {
                   {link.label}
                 </Link>
               ))}
-              <Link
-                to="/admin"
-                onClick={() => setMobileOpen(false)}
-                className={`block py-2.5 px-3 text-xs text-foreground/30 ${isRTL ? 'font-arabic' : 'font-english'}`}
-              >
-                {t('dashboard')}
-              </Link>
+              {user?.role === 'admin' && (
+                <Link
+                  to="/admin"
+                  onClick={() => setMobileOpen(false)}
+                  className={`block py-2.5 px-3 text-xs text-gold/50 ${isRTL ? 'font-arabic' : 'font-english'}`}
+                >
+                  {t('dashboard')}
+                </Link>
+              )}
+              {!user && (
+                <Link
+                  to={loginHref}
+                  onClick={() => setMobileOpen(false)}
+                  className={`block py-2.5 px-3 text-xs text-foreground/50 ${isRTL ? 'font-arabic' : 'font-english'}`}
+                >
+                  {isRTL ? 'دخول' : 'Login'}
+                </Link>
+              )}
+              {user && (
+                <button
+                  type="button"
+                  onClick={() => { setMobileOpen(false); logout(true); }}
+                  className={`block w-full py-2.5 px-3 text-start text-xs text-foreground/40 ${isRTL ? 'font-arabic' : 'font-english'}`}
+                >
+                  {isRTL ? 'خروج' : 'Logout'}
+                </button>
+              )}
             </div>
           </motion.div>
         )}
