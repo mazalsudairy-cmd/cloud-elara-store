@@ -2,16 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { useCart } from '@/lib/cartStore';
-import { ShoppingBag, Zap, Bot, Monitor } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-
-const categoryIcons = {
-  default: ShoppingBag,
-  tweak: Monitor,
-  bot: Bot,
-  discord: Bot,
-};
 
 export default function ProductCard({ product }) {
   const { t, isRTL, localized } = useLanguage();
@@ -52,12 +45,14 @@ export default function ProductCard({ product }) {
               </div>
             )}
 
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-navy/0 group-hover:bg-navy/30 transition-colors duration-300 flex items-end justify-center pb-4 opacity-0 group-hover:opacity-100">
+            {/* Desktop: quick add on hover (hidden on touch widths — mobile uses bar below) */}
+            <div className="pointer-events-none absolute inset-0 hidden bg-navy/0 opacity-0 transition-colors duration-300 group-hover:bg-navy/35 group-hover:opacity-100 md:flex md:items-end md:justify-center md:pb-4 md:group-hover:pointer-events-auto">
               <motion.button
+                type="button"
                 whileTap={{ scale: 0.9 }}
                 onClick={handleAdd}
-                className="px-5 py-2.5 bg-gold text-navy rounded-full text-sm font-bold flex items-center gap-2 shadow-lg shadow-gold/30"
+                disabled={product.stock === 0}
+                className="pointer-events-auto px-5 py-2.5 bg-gold text-navy rounded-full text-sm font-bold flex items-center gap-2 shadow-lg shadow-gold/30 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <ShoppingBag className="w-4 h-4" />
                 <span className={isRTL ? 'font-arabic' : 'font-english'}>{t('addToCart')}</span>
@@ -99,6 +94,20 @@ export default function ProductCard({ product }) {
                 {t('outOfStock')}
               </span>
             )}
+
+            {/* Mobile / coarse pointer: always-visible add — hover overlay is unusable on touch */}
+            <div className="mt-3 md:hidden">
+              <motion.button
+                type="button"
+                whileTap={{ scale: 0.98 }}
+                onClick={handleAdd}
+                disabled={product.stock === 0}
+                className={`flex w-full touch-manipulation items-center justify-center gap-2 rounded-xl bg-gold/95 py-3 text-sm font-bold text-navy shadow-md shadow-gold/20 transition-colors hover:bg-gold disabled:cursor-not-allowed disabled:opacity-40 ${isRTL ? 'font-arabic' : 'font-english'}`}
+              >
+                <ShoppingBag className="h-4 w-4 shrink-0" />
+                {t('addToCart')}
+              </motion.button>
+            </div>
           </div>
         </div>
       </Link>

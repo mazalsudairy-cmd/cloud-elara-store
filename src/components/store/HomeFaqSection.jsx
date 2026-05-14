@@ -29,7 +29,7 @@ export default function HomeFaqSection() {
             <div key={i} className="rounded-xl bg-navy-mid elara-border overflow-hidden">
               <button
                 onClick={() => setOpen(open === i ? null : i)}
-                className={`w-full flex items-center justify-between p-5 text-left hover:bg-gold/5 transition-colors ${isRTL ? 'text-right font-arabic' : 'font-english'}`}
+                className={`w-full flex items-center justify-between p-5 text-start hover:bg-gold/5 transition-colors ${isRTL ? 'font-arabic' : 'font-english'}`}
               >
                 <span className="text-sm text-foreground/80 font-medium">{faq.q}</span>
                 <ChevronDown className={`w-4 h-4 text-gold/40 flex-shrink-0 transition-transform ${open === i ? 'rotate-180' : ''} ${isRTL ? 'mr-4' : 'ml-4'}`} />

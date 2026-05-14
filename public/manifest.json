@@ -3,8 +3,15 @@
   "short_name": "Elara",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0f1e",
-  "theme_color": "#0a0f1e",
+  "background_color": "#050d1a",
+  "theme_color": "#050d1a",
   "lang": "en",
-  "icons": []
+  "icons": [
+    {
+      "src": "/branding/elara-brand-art.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
