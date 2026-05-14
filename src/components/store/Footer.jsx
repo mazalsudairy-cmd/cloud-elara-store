@@ -11,31 +11,31 @@ export default function Footer({ storeName }) {
 
   return (
     <footer className="mt-0 border-t border-gold/10 bg-navy">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-10">
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-4 md:gap-10">
           {/* Brand */}
-          <div className="md:col-span-5">
-            <h3 className="mb-4 font-display text-2xl font-bold tracking-wide text-foreground/95">
+          <div className="md:col-span-2">
+            <h3 className="mb-3 font-display text-xl font-bold tracking-widest text-foreground/90">
               {brand}
             </h3>
-            <p className={`max-w-sm text-sm leading-relaxed text-foreground/45 ${isRTL ? 'font-arabic' : 'font-english'}`}>
+            <p className={`max-w-md text-xs leading-relaxed text-foreground/40 ${isRTL ? 'font-arabic' : 'font-english'}`}>
               {isRTL
-                ? 'منتجات رقمية مميزة وحلول مخصصة مصممة بجودة وأناقة.'
-                : 'Premium digital products and custom solutions designed with quality and elegance.'}
+                ? 'منصة تجارة إلكترونية أنيقة ثنائية اللغة تمزج سرداً جمالياً راقياً مع محرك مرن لتجارة رقمية متميزة.'
+                : 'An elegant, bilingual e-commerce platform that blends high-end aesthetic storytelling with a powerful, modular engine for artisanal commerce.'}
             </p>
           </div>
 
           {/* Shop */}
-          <div className="md:col-span-3">
-            <h4 className="mb-5 font-display text-[11px] font-semibold uppercase tracking-[0.2em] text-gold/50">
+          <div>
+            <h4 className="mb-4 font-display text-[11px] font-semibold uppercase tracking-widest text-foreground/30">
               {isRTL ? 'التسوق' : 'Shop'}
             </h4>
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {[
                 { to: '/products', label: t('allProducts') },
                 { to: '/categories', label: t('categories') },
               ].map(l => (
-                <Link key={l.to} to={l.to} className={`block text-sm text-foreground/45 transition-colors hover:text-gold ${isRTL ? 'font-arabic' : 'font-english'}`}>
+                <Link key={l.to} to={l.to} className={`block text-xs text-foreground/35 transition-colors hover:text-gold ${isRTL ? 'font-arabic' : 'font-english'}`}>
                   {l.label}
                 </Link>
               ))}
@@ -43,18 +43,18 @@ export default function Footer({ storeName }) {
           </div>
 
           {/* Manage */}
-          <div className="md:col-span-4">
-            <h4 className="mb-5 font-display text-[11px] font-semibold uppercase tracking-[0.2em] text-gold/50">
+          <div>
+            <h4 className="mb-4 font-display text-[11px] font-semibold uppercase tracking-widest text-foreground/30">
               {t('dashboard')}
             </h4>
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {[
                 { to: '/admin', label: t('overview') },
                 { to: '/admin/products', label: t('manageProducts') },
                 { to: '/admin/categories', label: t('manageCategories') },
                 { to: '/admin/settings', label: t('storeSettings') },
               ].map(l => (
-                <Link key={l.to} to={l.to} className={`block text-sm text-foreground/45 transition-colors hover:text-gold ${isRTL ? 'font-arabic' : 'font-english'}`}>
+                <Link key={l.to} to={l.to} className={`block text-xs text-foreground/35 transition-colors hover:text-gold ${isRTL ? 'font-arabic' : 'font-english'}`}>
                   {l.label}
                 </Link>
               ))}
@@ -62,9 +62,9 @@ export default function Footer({ storeName }) {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-gold/10 pt-10 md:flex-row">
-          <p className={`text-center text-xs text-foreground/30 md:text-start ${isRTL ? 'font-arabic' : 'font-display tracking-wider'}`}>
-            {isRTL ? `© ${year} ${brand} — جميع الحقوق محفوظة` : `© ${year} ${brand} — All rights reserved`}
+        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-gold/8 pt-8 md:flex-row">
+          <p className={`text-center text-[11px] text-foreground/20 md:text-start ${isRTL ? 'font-arabic' : 'font-display tracking-wider uppercase'}`}>
+            {isRTL ? `© ${year} ${brand} — جميع الحقوق محفوظة` : `© ${year} ${brand.toUpperCase()} — ALL RIGHTS RESERVED`}
           </p>
           <div className="flex items-center gap-1">
             <div className="h-px w-4 bg-gold/20" />

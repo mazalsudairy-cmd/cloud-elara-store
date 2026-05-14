@@ -34,11 +34,10 @@ export default function Home() {
   return (
     <div>
       <HeroSection settings={settings} />
-      <div id="browse" className="scroll-mt-24" aria-hidden="true" />
 
       {/* Categories */}
       {categories.length > 0 && (
-        <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <SectionHeader title={t('categories')} isRTL={isRTL} />
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-8">
             {categories.map((cat, i) => (
@@ -50,7 +49,7 @@ export default function Home() {
 
       {/* Featured Products */}
       {featuredProducts.length > 0 && (
-        <section className="mx-auto max-w-7xl bg-navy-mid/[0.12] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="flex items-end justify-between mb-8">
             <SectionHeader title={t('featured')} isRTL={isRTL} noMargin />
             <Link
@@ -68,7 +67,7 @@ export default function Home() {
       )}
 
       {/* New Arrivals */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="flex items-end justify-between mb-8">
           <SectionHeader title={t('newArrivals')} isRTL={isRTL} noMargin />
           <Link
@@ -100,11 +99,11 @@ export default function Home() {
 
 function SectionHeader({ title, isRTL, noMargin = false }) {
   return (
-    <div className={noMargin ? '' : 'mb-10'}>
-      <h2 className={`text-2xl font-semibold tracking-tight text-foreground/95 md:text-3xl ${isRTL ? 'font-arabic' : 'font-display'}`}>
+    <div className={noMargin ? '' : 'mb-8'}>
+      <h2 className={`text-xl md:text-2xl font-semibold text-foreground/90 ${isRTL ? 'font-arabic' : 'font-display'}`}>
         {title}
       </h2>
-      <div className={`mt-3 h-px w-14 ${isRTL ? 'ml-auto bg-gradient-to-l from-gold/60 to-transparent' : 'bg-gradient-to-r from-gold/60 to-transparent'}`} />
+      <div className={`mt-2 h-px w-10 ${isRTL ? 'ml-auto bg-gold/40' : 'bg-gold/40'}`} />
     </div>
   );
 }

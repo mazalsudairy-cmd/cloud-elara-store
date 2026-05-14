@@ -24,8 +24,8 @@ export default function CategoryCard({ category, index }) {
             <div className="w-full h-full bg-gradient-to-br from-gold/8 via-navy-light to-navy" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-navy/85 via-navy/20 to-transparent" />
-          <div className="absolute bottom-4 start-4 end-4 sm:bottom-5 sm:start-5 sm:end-5">
-            <h3 className={`truncate text-sm font-semibold text-foreground/95 sm:text-base ${isRTL ? 'font-arabic' : 'font-english'}`}>
+          <div className="absolute bottom-3 start-3 end-3">
+            <h3 className={`font-medium text-sm text-foreground/90 truncate ${isRTL ? 'font-arabic' : 'font-english'}`}>
               {localized(category, 'name')}
             </h3>
           </div>

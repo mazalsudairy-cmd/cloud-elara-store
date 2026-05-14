@@ -1,36 +1,34 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;600&family=Cinzel:wght@400;600;700;800&family=Noto+Kufi+Arabic:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Noto+Kufi+Arabic:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Design tokens (Tailwind + Elara utilities) ───────────────────── */
+/* ─── Design tokens — matched to Base44 build (elarastore.base44.app) ── */
 @layer base {
   :root {
     --font-arabic: 'Noto Kufi Arabic', system-ui, sans-serif;
     --font-english: 'Inter', system-ui, sans-serif;
     --font-display: 'Cinzel', Georgia, serif;
-    --font-wordmark: 'Cinzel Decorative', 'Cinzel', Georgia, serif;
 
-    /* Elara celestial palette — deep navy #050d1a, ivory text, muted antique gold */
-    --navy: 222 72% 6%;
-    --navy-mid: 222 55% 10%;
-    --navy-light: 222 40% 15%;
-    --gold: 40 42% 58%;
-    --gold-light: 42 55% 72%;
+    --navy: 220 60% 6%;
+    --navy-mid: 220 45% 10%;
+    --navy-light: 220 35% 14%;
+    --gold: 42 72% 56%;
+    --gold-light: 42 80% 70%;
 
-    --background: 222 72% 6%;
-    --foreground: 0 0% 96%;
-    --card: 222 50% 9%;
-    --card-foreground: 0 0% 96%;
-    --popover: 222 50% 9%;
-    --popover-foreground: 0 0% 96%;
+    --background: 220 60% 6%;
+    --foreground: 42 30% 92%;
+    --card: 220 45% 10%;
+    --card-foreground: 42 30% 92%;
+    --popover: 220 45% 10%;
+    --popover-foreground: 42 30% 92%;
     --primary: 42 72% 56%;
     --primary-foreground: 220 60% 6%;
-    --secondary: 222 38% 14%;
-    --secondary-foreground: 40 25% 88%;
-    --muted: 222 32% 16%;
-    --muted-foreground: 222 12% 58%;
+    --secondary: 220 35% 14%;
+    --secondary-foreground: 42 30% 85%;
+    --muted: 220 30% 16%;
+    --muted-foreground: 220 15% 55%;
     --accent: 42 72% 56%;
     --accent-foreground: 220 60% 6%;
     --destructive: 0 72% 51%;
@@ -55,7 +53,6 @@
     --chart-4: 280 50% 55%;
     --chart-5: 0 72% 51%;
 
-    /* Mirror for non-Tailwind utilities (.text-gold, etc.) */
     --clr-navy: hsl(var(--navy));
     --clr-navy-mid: hsl(var(--navy-mid));
     --clr-navy-light: hsl(var(--navy-light));
@@ -72,8 +69,10 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply antialiased;
     font-feature-settings: 'rlig' 1, 'calt' 1;
+    background-color: #060c18;
+    color: hsl(var(--foreground));
   }
 
   #root {
@@ -130,10 +129,6 @@
     font-family: var(--font-english);
   }
 
-  .font-wordmark {
-    font-family: var(--font-wordmark);
-  }
-
   .elara-border {
     border: 1px solid rgba(212, 175, 90, 0.15);
   }
@@ -141,8 +136,8 @@
   .glass {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    background: rgba(5, 13, 26, 0.92);
-    border-bottom: 1px solid rgba(200, 175, 120, 0.16);
+    background: rgba(5, 11, 25, 0.85);
+    border-bottom: 1px solid rgba(212, 175, 90, 0.12);
   }
 
   .card-gold-hover {
@@ -155,11 +150,9 @@
 
   .stars-bg {
     background:
-      radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.04) 0%, transparent 42%),
-      radial-gradient(ellipse at 20% 55%, rgba(185, 155, 95, 0.06) 0%, transparent 48%),
-      radial-gradient(ellipse at 82% 22%, rgba(185, 155, 95, 0.045) 0%, transparent 38%),
-      radial-gradient(circle at 50% 120%, rgba(5, 13, 26, 0.9) 0%, transparent 55%),
-      hsl(var(--navy));
+      radial-gradient(ellipse at 20% 50%, rgba(212, 175, 90, 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(212, 175, 90, 0.03) 0%, transparent 40%),
+      #060c18;
   }
 
   .bg-gradient-radial {
