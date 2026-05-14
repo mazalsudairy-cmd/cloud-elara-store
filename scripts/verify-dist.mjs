@@ -23,10 +23,11 @@ if (!fs.existsSync(indexPath)) fail('Missing dist/index.html');
 const html = fs.readFileSync(indexPath, 'utf8');
 if (html.length < 300) fail(`dist/index.html too small (${html.length} bytes) — build likely failed silently.`);
 
-const hasModule = html.includes('type="module"') || html.includes('type=module');
-const hasAssets = html.includes('/assets/') || html.includes('assets/');
-if (!hasModule || !hasAssets) {
-  fail('dist/index.html does not reference built /assets/ bundles — check vite build output.');
+const hasBundle =
+  /\/assets\/[^"'\s>]+\.(js|mjs)/i.test(html) ||
+  (/assets\/[^"'\s>]+\.(js|mjs)/i.test(html) && (html.includes('type="module"') || html.includes("type='module'") || html.includes('type=module')));
+if (!hasBundle) {
+  fail('dist/index.html does not reference built JS under assets/ — vite build output invalid.');
 }
 
 if (!fs.existsSync(assetsDir)) fail('Missing dist/assets/ directory.');
