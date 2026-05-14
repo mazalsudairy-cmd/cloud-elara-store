@@ -6,8 +6,9 @@ import LanguageToggle from './LanguageToggle';
 import { ShoppingBag, Menu, X, LayoutDashboard, LogIn, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/AuthContext';
+import { uiLabel } from '@/lib/storeTheme';
 
-export default function Navbar({ storeName }) {
+export default function Navbar({ brandName = 'Cloud Elara', navLabels = {} }) {
   const { t, isRTL } = useLanguage();
   const { totalItems, setIsOpen } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -17,25 +18,18 @@ export default function Navbar({ storeName }) {
   const loginHref = `/login?return=${encodeURIComponent(`${location.pathname}${location.search}${location.hash}`)}`;
 
   const navLinks = [
-    { path: '/', label: t('home') },
-    { path: '/products', label: t('products') },
-    { path: '/categories', label: t('categories') },
-  ];
+    { path: '/', key: 'home' },
+    { path: '/products', key: 'products' },
+    { path: '/categories', key: 'categories' },
+  ].map((l) => ({ ...l, label: uiLabel(navLabels, isRTL, l.key, t) }));
 
   return (
     <nav className="sticky top-0 z-50 glass">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between min-h-[3.75rem] py-1.5">
           <Link to="/" className="flex min-w-0 items-center gap-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/40 rounded-md">
-            <span
-              className={`truncate leading-tight ${
-                isRTL
-                  ? 'font-brandArabic text-2xl sm:text-[1.7rem] text-[#eae1c9] md:text-[1.95rem]'
-                  : 'text-[11px] sm:text-xs font-display font-bold tracking-[0.28em] uppercase text-foreground/80'
-              }`}
-              style={isRTL ? { textShadow: '0 1px 18px rgba(201,168,76,0.22)', fontWeight: 400 } : undefined}
-            >
-              {storeName || (isRTL ? 'كلاود إلارا' : 'Cloud Elara')}
+            <span className="truncate leading-tight text-[13px] sm:text-sm md:text-[0.95rem] font-display font-bold tracking-[0.22em] uppercase text-[#eae1c9] md:tracking-[0.28em]">
+              {(brandName || 'Cloud Elara').trim()}
             </span>
           </Link>
 

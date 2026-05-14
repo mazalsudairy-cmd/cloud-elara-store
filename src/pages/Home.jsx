@@ -13,7 +13,7 @@ import CategoryCard from '@/components/store/CategoryCard';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 export default function Home() {
-  const { settings } = useOutletContext();
+  const { settings, brandNameEn, navLabels } = useOutletContext();
   const { t, isRTL } = useLanguage();
 
   const { data: products } = useQuery({
@@ -33,7 +33,7 @@ export default function Home() {
 
   return (
     <div>
-      <HeroSection settings={settings} />
+      <HeroSection settings={settings} brandName={brandNameEn} navLabels={navLabels} />
 
       {/* Categories */}
       {categories.length > 0 && (

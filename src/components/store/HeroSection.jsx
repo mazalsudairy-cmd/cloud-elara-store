@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { uiLabel } from '@/lib/storeTheme';
 
 function StarParticle({ x, y, size, delay }) {
   return (
@@ -23,8 +24,15 @@ const stars = Array.from({ length: 35 }, (_, i) => ({
   delay: Math.random() * 4,
 }));
 
-export default function HeroSection({ settings }) {
-  const { t, isRTL } = useLanguage();
+export default function HeroSection({ settings = {}, brandName = 'Cloud Elara', navLabels = {} }) {
+  const { t, isRTL, localized } = useLanguage();
+  const op = Number(settings?.hero_overlay_opacity);
+  const imgOp = Number.isFinite(op) ? Math.min(1, Math.max(0.02, op)) : 0.12;
+
+  const title = localized(settings, 'hero_title') || t('featured');
+  const sub = localized(settings, 'hero_subtitle');
+
+  const mark = (brandName || 'Cloud Elara').trim();
 
   return (
     <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-navy">
@@ -45,8 +53,8 @@ export default function HeroSection({ settings }) {
       </div>
 
       {settings?.hero_image && (
-        <div className="absolute inset-0 opacity-[0.08]">
-          <img src={settings.hero_image} alt="" className="w-full h-full object-cover" />
+        <div className="pointer-events-none absolute inset-0" style={{ opacity: imgOp }}>
+          <img src={settings.hero_image} alt="" className="h-full w-full object-cover" />
         </div>
       )}
 
@@ -58,51 +66,49 @@ export default function HeroSection({ settings }) {
             transition={{ duration: 0.55 }}
             className="mb-6"
           >
-            {isRTL ? (
-              <p
-                dir="rtl"
-                className="font-brandArabic inline-block max-w-[100%] text-5xl sm:text-6xl md:text-[4.75rem] leading-[1.05] tracking-wide text-[#f2e8c8]"
-                style={{
-                  textShadow: '0 2px 40px rgba(201,168,76,0.35), 0 1px 0 rgba(255,248,225,0.12)',
-                  fontWeight: 400,
-                }}
-              >
-                كلاود إلارا
-              </p>
-            ) : (
-              <p className="font-display text-4xl sm:text-5xl md:text-[3.5rem] tracking-[0.28em] font-bold uppercase text-[#f0e4c0] drop-shadow-[0_2px_28px_rgba(201,168,76,0.2)]">
-                Cloud Elara
-              </p>
-            )}
+            <p className="font-display text-[clamp(2rem,5vw,3.85rem)] font-bold uppercase leading-none tracking-[0.2em] text-[#f0e4c0] drop-shadow-[0_2px_32px_rgba(201,168,76,0.22)]">
+              {mark}
+            </p>
           </motion.div>
 
           <motion.h1
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className={`mb-12 text-[1.35rem] sm:text-2xl md:text-3xl font-semibold leading-snug text-foreground/88 ${isRTL ? 'font-arabic' : 'font-display tracking-wide text-foreground/80'}`}
+            className={`mb-8 text-[1.35rem] sm:text-2xl md:text-3xl font-semibold leading-snug text-foreground/88 ${isRTL ? 'font-arabic' : 'font-display tracking-wide text-foreground/80'}`}
           >
-            {isRTL ? 'منتجات مميزة بأسعار تناسبك' : 'Featured products at prices that work for you'}
+            {title}
           </motion.h1>
+
+          {sub ? (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+              className={`mb-10 max-w-xl text-base leading-relaxed text-foreground/45 ${isRTL ? 'font-arabic' : 'font-english'}`}
+            >
+              {sub}
+            </motion.p>
+          ) : null}
 
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.45 }}
+            transition={{ duration: 0.6, delay: 0.28 }}
             className="flex flex-wrap gap-4"
           >
             <Link
               to="/products"
               className={`inline-flex items-center gap-2 bg-gold text-navy px-7 py-3.5 rounded-lg text-sm font-bold hover:bg-gold-light transition-all duration-300 shadow-lg shadow-gold/15 ${isRTL ? 'font-arabic' : 'font-english'}`}
             >
-              <span>{t('shopNow')}</span>
+              <span>{uiLabel(navLabels, isRTL, 'shopNow', t)}</span>
               {isRTL ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
             </Link>
             <Link
               to="/categories"
               className={`inline-flex items-center gap-2 border border-gold/25 text-foreground/70 px-7 py-3.5 rounded-lg text-sm font-medium hover:border-gold/50 hover:text-gold transition-all duration-300 ${isRTL ? 'font-arabic' : 'font-english'}`}
             >
-              {t('exploreServices')}
+              {uiLabel(navLabels, isRTL, 'exploreServices', t)}
             </Link>
           </motion.div>
         </div>
