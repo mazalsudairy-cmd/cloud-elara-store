@@ -27,11 +27,20 @@ export default function AdminLogin() {
     return '/admin';
   })();
 
-  const expected = import.meta.env.VITE_ADMIN_PASSWORD;
+  const expected = import.meta.env.VITE_ADMIN_PASSWORD?.trim();
   const devFallback = import.meta.env.DEV && !expected ? 'admin' : null;
+  const prodWithoutPassword = import.meta.env.PROD && !expected;
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (prodWithoutPassword) {
+      setError(
+        isRTL
+          ? 'لم تُعرَّف كلمة مرور الإدارة. أضف VITE_ADMIN_PASSWORD في متغيرات البيئة على Vercel ثم أعد النشر.'
+          : 'Admin password is not configured. Add VITE_ADMIN_PASSWORD in Vercel env vars and redeploy.',
+      );
+      return;
+    }
     const ok = expected ? password === expected : devFallback != null && password === devFallback;
     if (!ok) {
       setError(isRTL ? 'كلمة المرور غير صحيحة' : 'Invalid password');
@@ -59,13 +68,17 @@ export default function AdminLogin() {
             {isRTL ? 'دخول الإدارة' : 'Admin sign-in'}
           </h1>
           <p className="text-xs text-foreground/40 text-center font-english">
-            {import.meta.env.VITE_ADMIN_PASSWORD
+            {expected
               ? isRTL
-                ? 'أدخل كلمة المرور المعرّفة في VITE_ADMIN_PASSWORD'
-                : 'Enter the password from VITE_ADMIN_PASSWORD'
-              : isRTL
-                ? 'وضع التطوير: جرّب كلمة المرور admin أو عرّف VITE_ADMIN_PASSWORD'
-                : 'Dev mode: try password admin, or set VITE_ADMIN_PASSWORD'}
+                ? 'أدخل كلمة المرور نفسها المعرّفة في VITE_ADMIN_PASSWORD على الاستضافة.'
+                : 'Use the same password you set in VITE_ADMIN_PASSWORD on your host.'
+              : import.meta.env.DEV
+                ? isRTL
+                  ? 'وضع التطوير فقط: جرّب كلمة المرور admin، أو عرّف VITE_ADMIN_PASSWORD في ملف .env'
+                  : 'Local dev only: password admin works, or set VITE_ADMIN_PASSWORD in .env'
+                : isRTL
+                  ? 'الإنتاج: أضف المتغير VITE_ADMIN_PASSWORD في Vercel (Settings → Environment Variables) ثم أعد نشر المشروع.'
+                  : 'Production: add VITE_ADMIN_PASSWORD in Vercel → Environment Variables, then redeploy.'}
           </p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
