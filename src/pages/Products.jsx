@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/api/client';
@@ -8,11 +9,19 @@ import { Input } from '@/components/ui/input';
 
 export default function Products() {
   const { t, isRTL, localized } = useLanguage();
-  const urlParams = new URLSearchParams(window.location.search);
+  const location = useLocation();
+  const urlParams = new URLSearchParams(location.search);
   const categoryFilter = urlParams.get('category');
+  const searchFilter = urlParams.get('search');
 
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(searchFilter || '');
   const [selectedCategory, setSelectedCategory] = useState(categoryFilter || 'all');
+
+  useEffect(() => {
+    const p = new URLSearchParams(location.search);
+    setSearch(p.get('search') || '');
+    setSelectedCategory(p.get('category') || 'all');
+  }, [location.search]);
 
   const { data: products } = useQuery({
     queryKey: ['products-all'],

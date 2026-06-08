@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/api/client';
+import { THEME_PRESET_LIST } from '@/lib/storeTheme';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,14 +11,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import ImageUploader from '@/components/admin/ImageUploader';
 import { toast } from 'sonner';
-import { Save, Palette } from 'lucide-react';
+import { Save, Palette, Wand2, ExternalLink } from 'lucide-react';
 
 function defaultCustomizeForm() {
   return {
     currency: 'SAR',
     show_featured: true,
-    products_per_row: 3,
+    products_per_row: 4,
     layout_style: 'grid',
+    theme_preset: 'violet',
     store_name_ar: '',
     store_name_en: 'Cloud Elara',
     hero_title_ar: 'منتجات مميزة بأسعار تناسبك',
@@ -163,6 +166,62 @@ export default function AdminCustomize() {
       </div>
 
       <div className="space-y-6 max-w-4xl">
+        {/* Live editor callout */}
+        <Card className="border-gold/30 bg-gold/5">
+          <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gold/15 text-gold">
+                <Wand2 className="h-5 w-5" />
+              </span>
+              <div>
+                <h3 className={`text-sm font-bold ${isRTL ? 'font-arabic' : 'font-english'}`}>
+                  {isRTL ? 'المحرر الحي (الأسهل)' : 'Live editor (easiest)'}
+                </h3>
+                <p className={`mt-1 text-xs text-muted-foreground ${isRTL ? 'font-arabic' : 'font-english'}`}>
+                  {isRTL
+                    ? 'افتح المتجر واضغط زر «تخصيص» العائم لتعديل الألوان والبانرات والأقسام بمعاينة فورية.'
+                    : 'Open your store and click the floating “Customize” button to edit colors, banners and sections with instant preview.'}
+                </p>
+              </div>
+            </div>
+            <Button asChild className="rounded-xl btn-primary font-bold">
+              <Link to="/">
+                <ExternalLink className="h-4 w-4" />
+                {isRTL ? 'افتح المحرر الحي' : 'Open live editor'}
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Theme presets */}
+        <Card>
+          <CardHeader>
+            <CardTitle className={isRTL ? 'font-arabic' : 'font-english'}>{isRTL ? 'الثيم الجاهز' : 'Theme preset'}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+              {THEME_PRESET_LIST.map((p) => (
+                <button
+                  key={p.key}
+                  type="button"
+                  onClick={() => setForm({ ...form, theme_preset: p.key })}
+                  className={`flex items-center gap-2 rounded-xl border p-2.5 text-start transition-colors ${
+                    (form.theme_preset || 'violet') === p.key ? 'border-gold bg-gold/10' : 'border-border hover:border-gold/40'
+                  }`}
+                >
+                  <span className="h-6 w-6 shrink-0 rounded-full" style={{ background: p.swatch }} />
+                  <span className={`text-xs font-medium ${isRTL ? 'font-arabic' : 'font-english'}`}>
+                    {isRTL ? p.label_ar : p.label_en}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <p className={`mt-3 text-[11px] text-muted-foreground ${isRTL ? 'font-arabic' : 'font-english'}`}>
+              {isRTL ? 'اختيار ثيم يطبّق لوحة ألوان كاملة. تقدر تعدّل ألوان محددة بالأسفل (HEX).' : 'Picking a preset applies a full palette. Override specific colors below (HEX).'}
+            </p>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle className={isRTL ? 'font-arabic' : 'font-english'}>{t('brandEnglishOnly')}</CardTitle>

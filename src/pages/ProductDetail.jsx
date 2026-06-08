@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import ProductCard from '@/components/store/ProductCard';
 import ProductPrice from '@/components/store/ProductPrice';
 import { isMonthlyProduct } from '@/lib/productPricing';
-import { ShoppingBag, Minus, Plus, ArrowLeft, ArrowRight } from 'lucide-react';
+import { ShoppingBag, Minus, Plus, ArrowLeft, ArrowRight, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -120,6 +120,12 @@ export default function ProductDetail() {
                 </span>
                 <span className="bg-destructive/15 text-destructive text-xs font-bold px-2 py-1 rounded-full">-{discountPct}%</span>
               </>
+            )}
+            {monthly && (
+              <span className={`inline-flex items-center gap-1.5 rounded-full bg-gold/12 px-3 py-1 text-xs font-bold text-gold ${isRTL ? 'font-arabic' : 'font-english'}`}>
+                <RefreshCw className="h-3.5 w-3.5" />
+                {t('pricePeriodMonth')}
+              </span>
             )}
           </div>
 

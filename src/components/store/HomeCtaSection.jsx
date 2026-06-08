@@ -4,38 +4,43 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export default function HomeCtaSection() {
+export default function HomeCtaSection({ brandName = '' }) {
   const { t, isRTL } = useLanguage();
+  const mark = (brandName || '').trim();
 
   return (
     <section className="py-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="rounded-2xl bg-navy-mid elara-border text-center px-8 py-16 relative overflow-hidden"
+          className="surface relative overflow-hidden rounded-3xl px-8 py-16 text-center"
         >
-          <div className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(212,175,90,0.06) 0%, transparent 60%)' }} />
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{ background: 'radial-gradient(ellipse at 50% 0%, hsl(var(--gold)/0.14) 0%, transparent 60%)' }}
+          />
           <div className="relative">
-            <div className="inline-flex items-center gap-2 mb-6">
-              <div className="h-px w-5 bg-gold/40" />
-              <span className="text-gold/50 text-xs font-display tracking-widest uppercase">Elara Store</span>
-              <div className="h-px w-5 bg-gold/40" />
-            </div>
-            <h2 className={`text-2xl md:text-3xl font-bold text-foreground/90 mb-4 ${isRTL ? 'font-arabic' : 'font-display'}`}>
+            {mark ? (
+              <div className="mb-6 inline-flex items-center gap-2">
+                <div className="h-px w-5 bg-gold/40" />
+                <span className="font-display text-xs uppercase tracking-widest text-gold/70">{mark}</span>
+                <div className="h-px w-5 bg-gold/40" />
+              </div>
+            ) : null}
+            <h2 className={`mb-4 text-2xl font-bold text-foreground/90 md:text-3xl ${isRTL ? 'font-arabic' : 'font-display'}`}>
               {t('ctaTitle')}
             </h2>
-            <p className={`text-sm text-foreground/40 mb-10 max-w-md mx-auto leading-relaxed ${isRTL ? 'font-arabic' : 'font-english'}`}>
+            <p className={`mx-auto mb-10 max-w-md text-sm leading-relaxed text-foreground/45 ${isRTL ? 'font-arabic' : 'font-english'}`}>
               {t('ctaSubtitle')}
             </p>
             <Link
               to="/products"
-              className={`inline-flex items-center gap-2 bg-gold text-navy px-8 py-3.5 rounded-lg text-sm font-bold hover:bg-gold-light transition-all duration-300 shadow-lg shadow-gold/15 ${isRTL ? 'font-arabic' : 'font-english'}`}
+              className={`inline-flex items-center gap-2 rounded-xl btn-primary px-8 py-3.5 text-sm font-bold ${isRTL ? 'font-arabic' : 'font-english'}`}
             >
               <span>{t('ctaBtn')}</span>
-              {isRTL ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
+              {isRTL ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
             </Link>
           </div>
         </motion.div>

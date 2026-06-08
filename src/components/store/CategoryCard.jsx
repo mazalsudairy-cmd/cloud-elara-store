@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { motion } from 'framer-motion';
+import { ArrowLeft, ArrowRight, LayoutGrid } from 'lucide-react';
 
 export default function CategoryCard({ category, index }) {
   const { isRTL, localized } = useLanguage();
@@ -9,25 +10,31 @@ export default function CategoryCard({ category, index }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.07 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: (index % 6) * 0.06 }}
     >
-      <Link to={`/products?category=${category.id}`} className="block group">
-        <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-navy-mid elara-border card-gold-hover">
+      <Link to={`/products?category=${category.id}`} className="group block">
+        <div className="surface card-gold-hover relative aspect-[4/3] overflow-hidden rounded-2xl">
           {category.image ? (
             <img
               src={category.image}
               alt={localized(category, 'name')}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-gold/8 via-navy-light to-navy" />
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gold/10 via-navy-light to-navy">
+              <LayoutGrid className="h-10 w-10 text-gold/30" />
+            </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-navy/85 via-navy/20 to-transparent" />
-          <div className="absolute bottom-3 start-3 end-3">
-            <h3 className={`font-medium text-sm text-foreground/90 truncate ${isRTL ? 'font-arabic' : 'font-english'}`}>
+          <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/40 to-transparent" />
+          <div className="absolute inset-x-4 bottom-4 flex items-center justify-between">
+            <h3 className={`truncate text-sm font-bold text-foreground ${isRTL ? 'font-arabic' : 'font-english'}`}>
               {localized(category, 'name')}
             </h3>
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold opacity-0 transition-opacity group-hover:opacity-100">
+              {isRTL ? <ArrowLeft className="h-3.5 w-3.5" /> : <ArrowRight className="h-3.5 w-3.5" />}
+            </span>
           </div>
         </div>
       </Link>
