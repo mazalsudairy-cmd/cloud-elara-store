@@ -32,6 +32,7 @@ import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage';
 import AccountHelpPage from '@/pages/auth/AccountHelpPage';
 import AdminUsers from '@/pages/admin/AdminUsers';
 import AdminCustomize from '@/pages/admin/AdminCustomize';
+import AdminIntegrations from '@/pages/admin/AdminIntegrations';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -78,6 +79,7 @@ const AuthenticatedApp = () => {
           <Route path="/admin/settings" element={<AdminSettings />} />
           <Route path="/admin/customize" element={<AdminCustomize />} />
           <Route path="/admin/payment" element={<AdminPayment />} />
+          <Route path="/admin/integrations" element={<AdminIntegrations />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
           <Route path="/admin/users" element={<AdminUsers />} />
         </Route>

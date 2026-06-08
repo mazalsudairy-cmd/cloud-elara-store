@@ -21,6 +21,43 @@ export default {
       type: 'boolean',
       default: false,
     },
+
+    // Payment gateway aggregator (NOT Stripe): mada / Visa / Mastercard / Apple Pay / STC Pay
+    gateway_enabled: {
+      type: 'boolean',
+      default: false,
+    },
+    gateway_provider: {
+      type: 'string',
+      enum: ['moyasar', 'tap', 'hyperpay', 'paytabs', 'checkout', 'stripe', 'custom'],
+      default: 'moyasar',
+      description: 'moyasar = embedded form; tap/hyperpay/paytabs/checkout/stripe = hosted payment link redirect; custom = HTML embed',
+    },
+    gateway_publishable_key: {
+      type: 'string',
+      description: 'Moyasar publishable key (pk_live_... / pk_test_...)',
+    },
+    gateway_payment_url: {
+      type: 'string',
+      description: 'Hosted payment link / page URL for redirect-based providers (Tap, HyperPay, PayTabs, Checkout.com, Stripe Payment Link)',
+    },
+    gateway_method_card: {
+      type: 'boolean',
+      default: true,
+    },
+    gateway_method_applepay: {
+      type: 'boolean',
+      default: true,
+    },
+    gateway_method_stcpay: {
+      type: 'boolean',
+      default: false,
+    },
+    gateway_embed_html: {
+      type: 'string',
+      description: 'Custom provider hosted form/button HTML (script tags stripped at render)',
+    },
+
     checkout_notes_ar: {
       type: 'string',
     },

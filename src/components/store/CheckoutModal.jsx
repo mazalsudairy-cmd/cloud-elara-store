@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/lib/i18n';
 import { useCart } from '@/lib/cartStore';
 import { api } from '@/api/client';
-import { X, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
+import { getEmailSettings } from '@/lib/integrations/emailClient';
+import { X, CheckCircle, Loader2, AlertCircle, CreditCard } from 'lucide-react';
 import { isMonthlyProduct } from '@/lib/productPricing';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,13 @@ function normalizePaymentSettings(raw) {
     paypal_client_id: ps.paypal_client_id || '',
     paypal_button_html: ps.paypal_button_html || '',
     applepay_enabled: !!ps.applepay_enabled,
+    gateway_enabled: !!ps.gateway_enabled,
+    gateway_provider: ps.gateway_provider || 'moyasar',
+    gateway_publishable_key: ps.gateway_publishable_key || '',
+    gateway_method_card: ps.gateway_method_card !== false,
+    gateway_method_applepay: ps.gateway_method_applepay !== false,
+    gateway_method_stcpay: !!ps.gateway_method_stcpay,
+    gateway_embed_html: ps.gateway_embed_html || '',
     bank_transfer_enabled: false,
     stc_pay_enabled: false,
     checkout_notes_ar: ps.checkout_notes_ar || '',
@@ -36,7 +44,24 @@ function normalizePaymentSettings(raw) {
   };
 }
 
-const PaymentIcon = ({ method, selected }) => {
+const LINK_PROVIDER_NAMES = {
+  tap: 'Tap Payments',
+  hyperpay: 'HyperPay',
+  paytabs: 'PayTabs',
+  checkout: 'Checkout.com',
+  stripe: 'Stripe',
+};
+
+function gatewayReady(ps) {
+  if (!ps?.gateway_enabled) return false;
+  const p = ps.gateway_provider || 'moyasar';
+  if (p === 'moyasar') return !!ps.gateway_publishable_key?.trim();
+  if (p === 'custom') return !!ps.gateway_embed_html?.trim();
+  if (LINK_PROVIDER_NAMES[p]) return !!ps.gateway_payment_url?.trim();
+  return false;
+}
+
+const PaymentIcon = ({ method, selected, label }) => {
   const base = `flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 p-3 cursor-pointer transition-all duration-200 ${
     selected ? 'border-gold bg-gold/10' : 'border-white/10 bg-white/5 hover:border-white/20'
   }`;
@@ -68,6 +93,14 @@ const PaymentIcon = ({ method, selected }) => {
         <span className={`text-[10px] font-bold font-english ${selected ? 'text-gold' : 'text-white/40'}`}>PayPal</span>
       </div>
     ),
+    gateway: (
+      <div className={base}>
+        <CreditCard className={`h-6 w-6 ${selected ? 'text-gold' : 'text-white/40'}`} />
+        <span className={`text-[10px] font-bold ${selected ? 'text-gold' : 'text-white/40'} ${label?.rtl ? 'font-arabic' : 'font-english'}`}>
+          {label?.text || 'Card / Apple Pay'}
+        </span>
+      </div>
+    ),
   };
   return icons[method] || null;
 };
@@ -75,6 +108,9 @@ const PaymentIcon = ({ method, selected }) => {
 function getEnabledMethods(ps) {
   if (!ps) return [];
   const methods = [];
+  if (gatewayReady(ps)) {
+    methods.push({ value: 'gateway', labelAr: 'بطاقة / Apple Pay', labelEn: 'Card / Apple Pay' });
+  }
   if (ps.paypal_enabled) {
     methods.push({ value: 'paypal', labelAr: 'PayPal', labelEn: 'PayPal' });
   }
@@ -96,6 +132,8 @@ export default function CheckoutModal({ onClose }) {
   const [errors, setErrors] = useState({});
 
   const paypalEmbedRef = useRef(null);
+  const gatewayEmbedRef = useRef(null);
+  const submitRef = useRef(null);
 
   useEffect(() => {
     api.entities.PaymentSettings.list().then((list) => {
@@ -149,6 +187,16 @@ export default function CheckoutModal({ onClose }) {
                 },
               ],
             }),
+          onApprove: async (_, actions) => {
+            try {
+              await actions.order.capture();
+            } catch (err) {
+              console.error('PayPal capture failed', err);
+            }
+            // Record the order once payment is approved/captured.
+            submitRef.current?.();
+          },
+          onError: (err) => console.error('PayPal error', err),
         })
         .render(`#${containerId}`);
     };
@@ -173,6 +221,87 @@ export default function CheckoutModal({ onClose }) {
     };
   }, [form.payment_method, paymentSettings?.paypal_client_id, paymentSettings?.paypal_button_html, paymentSettings?.currency, totalPrice]);
 
+  // Payment gateway (Moyasar embedded form or custom HTML embed)
+  useEffect(() => {
+    if (!paymentSettings || form.payment_method !== 'gateway') return undefined;
+
+    if (paymentSettings.gateway_provider === 'custom') {
+      const ref = gatewayEmbedRef.current;
+      if (!ref) return undefined;
+      ref.innerHTML = sanitizePayPalHtml(paymentSettings.gateway_embed_html || '');
+      return () => {
+        if (ref) ref.innerHTML = '';
+      };
+    }
+
+    // Redirect/link-based providers render a simple button (no SDK to mount).
+    if (paymentSettings.gateway_provider !== 'moyasar') return undefined;
+
+    const key = paymentSettings.gateway_publishable_key?.trim();
+    if (!key) return undefined;
+
+    const amount = Math.max(100, Math.round((Number(totalPrice) || 0) * 100));
+    const methods = [];
+    if (paymentSettings.gateway_method_card) methods.push('creditcard');
+    if (paymentSettings.gateway_method_applepay) methods.push('applepay');
+    if (paymentSettings.gateway_method_stcpay) methods.push('stcpay');
+    if (methods.length === 0) methods.push('creditcard');
+
+    const hostId = 'moyasar-gateway-host';
+    const CSS_ID = 'moyasar-css';
+    const JS_ID = 'moyasar-js';
+    let cancelled = false;
+
+    const init = () => {
+      if (cancelled) return;
+      const host = document.getElementById(hostId);
+      if (!host || !window.Moyasar) return;
+      host.innerHTML = '';
+      try {
+        window.Moyasar.init({
+          element: `#${hostId}`,
+          amount,
+          currency: paymentSettings.currency || 'SAR',
+          description: 'Cloud Elara order',
+          publishable_api_key: key,
+          callback_url: `${window.location.origin}/`,
+          methods,
+          apple_pay: { country: 'SA', label: document.title || 'Store' },
+        });
+      } catch (err) {
+        console.error('Moyasar init failed', err);
+      }
+    };
+
+    if (!document.getElementById(CSS_ID)) {
+      const link = document.createElement('link');
+      link.id = CSS_ID;
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.moyasar.com/mpf/1.15.0/moyasar.css';
+      document.head.appendChild(link);
+    }
+
+    if (window.Moyasar) {
+      init();
+    } else {
+      let script = document.getElementById(JS_ID);
+      if (!script) {
+        script = document.createElement('script');
+        script.id = JS_ID;
+        script.src = 'https://cdn.moyasar.com/mpf/1.15.0/moyasar.js';
+        script.async = true;
+        document.body.appendChild(script);
+      }
+      script.addEventListener('load', init);
+    }
+
+    return () => {
+      cancelled = true;
+      const host = document.getElementById(hostId);
+      if (host) host.innerHTML = '';
+    };
+  }, [form.payment_method, paymentSettings, totalPrice]);
+
   const enabledMethods = getEnabledMethods(paymentSettings);
 
   const validate = () => {
@@ -182,6 +311,63 @@ export default function CheckoutModal({ onClose }) {
     if (!form.payment_method) e.payment_method = true;
     setErrors(e);
     return Object.keys(e).length === 0;
+  };
+
+  const buildItemsHtml = () => items
+    .map((i) => {
+      const name = localized(i.product, 'name');
+      const line = (Number(i.product.price) * i.quantity).toFixed(0);
+      return `<tr><td style="padding:6px 0;">${name} × ${i.quantity}</td><td style="padding:6px 0;text-align:end;">${line} SAR</td></tr>`;
+    })
+    .join('');
+
+  const sendOrderEmails = async (num) => {
+    let settings = {};
+    try {
+      settings = await getEmailSettings();
+    } catch {
+      /* ignore — fall back to env */
+    }
+    const ownerTo = settings.order_notification_email || import.meta.env.VITE_ORDER_NOTIFICATION_EMAIL;
+    const itemsHtml = buildItemsHtml();
+    const totalStr = `${Number(totalPrice).toFixed(0)} SAR`;
+
+    if (ownerTo) {
+      await api.integrations.Core.SendEmail({
+        to: ownerTo,
+        subject: `🛒 New order ${num} — Cloud Elara`,
+        body: `
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  <h2 style="color: #c9a84c; border-bottom: 2px solid #c9a84c; padding-bottom: 10px;">New order #${num}</h2>
+  <p><strong>Name:</strong> ${form.name}</p>
+  <p><strong>Email:</strong> ${form.email}</p>
+  <p><strong>Phone:</strong> ${form.phone || '-'}</p>
+  <p><strong>Payment method:</strong> ${form.payment_method}</p>
+  <table style="width:100%;border-collapse:collapse;margin-top:8px;">${itemsHtml}</table>
+  <h3 style="color: #c9a84c;">Total: ${totalStr}</h3>
+  ${form.notes ? `<p><strong>Notes:</strong> ${form.notes}</p>` : ''}
+</div>`,
+      }).catch(() => {});
+    }
+
+    if (settings.send_order_confirmation && form.email) {
+      await api.integrations.Core.SendEmail({
+        to: form.email,
+        subject: `✅ Order confirmation ${num} — Cloud Elara`,
+        body: `
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  <h2 style="color: #c9a84c;">Thank you, ${form.name || 'customer'}!</h2>
+  <p>We received your order <strong>#${num}</strong>.</p>
+  <table style="width:100%;border-collapse:collapse;margin-top:8px;">${itemsHtml}</table>
+  <h3 style="color: #c9a84c;">Total: ${totalStr}</h3>
+  <p style="color:#888;font-size:12px;">We'll contact you shortly to finalize delivery.</p>
+</div>`,
+      }).catch(() => {});
+    }
+
+    if (!ownerTo && !settings.send_order_confirmation) {
+      console.info('[Elara] Order placed; enable Admin → Integrations → Email to send notifications.', num);
+    }
   };
 
   const handleSubmit = async () => {
@@ -212,23 +398,7 @@ export default function CheckoutModal({ onClose }) {
       payment_status: 'unpaid',
     });
 
-    const notifyTo = import.meta.env.VITE_ORDER_NOTIFICATION_EMAIL;
-    if (notifyTo) {
-      await api.integrations.Core.SendEmail({
-        to: notifyTo,
-        subject: `🛒 طلب جديد ${num} - Cloud Elara`,
-        body: `
-<div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-  <h2 style="color: #c9a84c; border-bottom: 2px solid #c9a84c; padding-bottom: 10px;">طلب جديد #${num}</h2>
-  <p><strong>الاسم:</strong> ${form.name}</p>
-  <p><strong>البريد:</strong> ${form.email}</p>
-  <p><strong>طريقة الدفع:</strong> ${form.payment_method}</p>
-  <h3 style="color: #c9a84c;">الإجمالي: ${totalPrice.toFixed(0)} SAR</h3>
-</div>`,
-      });
-    } else {
-      console.info('[Elara] Order placed; set VITE_ORDER_NOTIFICATION_EMAIL for email notifications.', num);
-    }
+    await sendOrderEmails(num);
 
     setOrderNum(num);
     clearCart();
@@ -236,8 +406,47 @@ export default function CheckoutModal({ onClose }) {
     setLoading(false);
   };
 
+  submitRef.current = handleSubmit;
+
   const getPaymentInfo = () => {
     if (!paymentSettings || !form.payment_method) return null;
+
+    if (form.payment_method === 'gateway') {
+      const provider = paymentSettings.gateway_provider || 'moyasar';
+      const isCustom = provider === 'custom';
+      const linkName = LINK_PROVIDER_NAMES[provider];
+      return (
+        <div className="mt-3 space-y-2">
+          <p className={`text-[10px] uppercase tracking-wider text-gold/50 ${isRTL ? 'font-arabic' : 'font-english'}`}>
+            {isRTL ? 'الدفع الآمن (مدى / فيزا / Apple Pay)' : 'Secure payment (mada / Visa / Apple Pay)'}
+          </p>
+          {provider === 'moyasar' && (
+            <div id="moyasar-gateway-host" className="mysr-form min-h-[60px] rounded-lg bg-white p-3" dir="ltr" />
+          )}
+          {isCustom && (
+            <div ref={gatewayEmbedRef} className="rounded-lg border border-white/10 bg-white/5 p-3" dir="ltr" />
+          )}
+          {linkName && (
+            <a
+              href={paymentSettings.gateway_payment_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gold py-3 text-sm font-bold text-navy transition-colors hover:bg-gold-light"
+            >
+              <CreditCard className="h-4 w-4" />
+              <span className={isRTL ? 'font-arabic' : 'font-english'}>
+                {isRTL ? `ادفع عبر ${linkName}` : `Pay with ${linkName}`}
+              </span>
+            </a>
+          )}
+          <p className={`text-[11px] text-white/45 ${isRTL ? 'font-arabic' : 'font-english'}`}>
+            {isRTL
+              ? 'أكمل الدفع عبر النموذج/الرابط بالأعلى، ثم اضغط «تأكيد الطلب» لتسجيل طلبك.'
+              : 'Complete payment via the form/link above, then press “Place Order” to record your order.'}
+          </p>
+        </div>
+      );
+    }
 
     if (form.payment_method === 'applepay') {
       return (
@@ -419,7 +628,7 @@ export default function CheckoutModal({ onClose }) {
                     <div className={`grid gap-2 ${enabledMethods.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
                       {enabledMethods.map((pm) => (
                         <div key={pm.value} role="button" tabIndex={0} onClick={() => setForm({ ...form, payment_method: pm.value })} onKeyDown={(e) => e.key === 'Enter' && setForm({ ...form, payment_method: pm.value })}>
-                          <PaymentIcon method={pm.value} selected={form.payment_method === pm.value} />
+                          <PaymentIcon method={pm.value} selected={form.payment_method === pm.value} label={{ text: isRTL ? pm.labelAr : pm.labelEn, rtl: isRTL }} />
                         </div>
                       ))}
                     </div>

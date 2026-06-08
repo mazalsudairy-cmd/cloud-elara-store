@@ -2,7 +2,7 @@ import { getInitialDb, ELARA_CATALOG_VERSION } from '@/api/seedData';
 
 const STORAGE_KEY = 'elara_local_db_v1';
 
-const REQUIRED_COLLECTIONS = ['User', 'AuthConfig', 'PasswordResetToken'];
+const REQUIRED_COLLECTIONS = ['User', 'AuthConfig', 'PasswordResetToken', 'AuthSettings', 'EmailSettings'];
 
 function ensureCollections(db) {
   let changed = false;

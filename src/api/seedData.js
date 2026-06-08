@@ -262,6 +262,14 @@ export function getInitialDb() {
       paypal_client_id: '',
       paypal_button_html: '',
       applepay_enabled: false,
+      gateway_enabled: false,
+      gateway_provider: 'moyasar',
+      gateway_publishable_key: '',
+      gateway_payment_url: '',
+      gateway_method_card: true,
+      gateway_method_applepay: true,
+      gateway_method_stcpay: false,
+      gateway_embed_html: '',
       bank_transfer_enabled: false,
       bank_name: '',
       bank_iban: '',
@@ -277,6 +285,45 @@ export function getInitialDb() {
     },
   ];
 
+  const authSettings = [
+    {
+      id: 'auth-1',
+      auth_enabled: false,
+      auth_provider: 'local',
+      require_email_verification: true,
+      firebase_api_key: '',
+      firebase_auth_domain: '',
+      firebase_project_id: '',
+      firebase_app_id: '',
+      firebase_messaging_sender_id: '',
+      supabase_url: '',
+      supabase_anon_key: '',
+      clerk_publishable_key: '',
+      auth0_domain: '',
+      auth0_client_id: '',
+      auth0_audience: '',
+      appwrite_endpoint: 'https://cloud.appwrite.io/v1',
+      appwrite_project_id: '',
+      created_date: now(),
+      updated_date: now(),
+    },
+  ];
+
+  const emailSettings = [
+    {
+      id: 'email-1',
+      email_enabled: false,
+      email_provider: 'resend',
+      from_email: '',
+      from_name: 'Cloud Elara',
+      reply_to: '',
+      order_notification_email: '',
+      send_order_confirmation: true,
+      created_date: now(),
+      updated_date: now(),
+    },
+  ];
+
   return {
     _catalog_version: ELARA_CATALOG_VERSION,
     Product: products,
@@ -284,5 +331,7 @@ export function getInitialDb() {
     Order: [],
     StoreSettings: storeSettings,
     PaymentSettings: paymentSettings,
+    AuthSettings: authSettings,
+    EmailSettings: emailSettings,
   };
 }

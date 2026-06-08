@@ -8,8 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Save, CreditCard, Globe } from 'lucide-react';
+import { Save, CreditCard, Globe, Wallet } from 'lucide-react';
 
 const PaymentMethodCard = ({ icon: IconComp, title, description, enabled, onToggle, children }) => (
   <Card className={`transition-all duration-300 ${enabled ? 'border-gold/40 shadow-lg shadow-gold/5' : 'border-border/50 opacity-60'}`}>
@@ -35,6 +36,22 @@ const PaymentMethodCard = ({ icon: IconComp, title, description, enabled, onTogg
   </Card>
 );
 
+/** Redirect/link-based providers (no backend needed): admin pastes a hosted payment link. */
+const LINK_PROVIDERS = {
+  tap: { name: 'Tap Payments', help_ar: 'من لوحة Tap: أنشئ Payment Link والصق الرابط هنا.', help_en: 'In Tap: create a Payment Link and paste the URL here.' },
+  hyperpay: { name: 'HyperPay', help_ar: 'من HyperPay: أنشئ صفحة/رابط دفع مستضاف والصقه هنا.', help_en: 'In HyperPay: create a hosted payment page/link and paste it here.' },
+  paytabs: { name: 'PayTabs', help_ar: 'من PayTabs: أنشئ Payment Link والصق الرابط هنا.', help_en: 'In PayTabs: create a Payment Link and paste it here.' },
+  checkout: { name: 'Checkout.com', help_ar: 'من Checkout.com: أنشئ Payment Link والصق الرابط هنا.', help_en: 'In Checkout.com: create a Payment Link and paste it here.' },
+  stripe: { name: 'Stripe', help_ar: 'من Stripe: Payment Links → أنشئ رابطاً والصقه هنا (يدعم Apple Pay والبطاقات).', help_en: 'In Stripe: Payment Links → create a link and paste it here (supports Apple Pay & cards).' },
+};
+
+const ToggleLine = ({ label, checked, onChange }) => (
+  <div className="flex items-center justify-between rounded-lg border border-border/50 px-3 py-2">
+    <span className="text-xs text-foreground/80">{label}</span>
+    <Switch checked={checked} onCheckedChange={onChange} />
+  </div>
+);
+
 function defaultPaymentForm() {
   return {
     paypal_enabled: true,
@@ -42,6 +59,14 @@ function defaultPaymentForm() {
     paypal_client_id: '',
     paypal_button_html: '',
     applepay_enabled: false,
+    gateway_enabled: false,
+    gateway_provider: 'moyasar',
+    gateway_publishable_key: '',
+    gateway_payment_url: '',
+    gateway_method_card: true,
+    gateway_method_applepay: true,
+    gateway_method_stcpay: false,
+    gateway_embed_html: '',
     bank_transfer_enabled: false,
     bank_name: '',
     bank_iban: '',
@@ -108,7 +133,7 @@ export default function AdminPayment() {
             {isRTL ? 'إعدادات الدفع' : 'Payment Settings'}
           </h1>
           <p className={`mt-1 text-sm text-muted-foreground ${isRTL ? 'font-arabic' : 'font-english'}`}>
-            {isRTL ? 'PayPal و Apple Pay فقط — الصق كود أزرار PayPal أو أدخل Client ID' : 'PayPal and Apple Pay only — paste PayPal button code or enter Client ID'}
+            {isRTL ? 'بوابة دفع (مدى/فيزا/Apple Pay/STC Pay) + PayPal' : 'Payment gateway (mada/Visa/Apple Pay/STC Pay) + PayPal'}
           </p>
         </div>
         <Button onClick={() => saveMutation.mutate(form)} disabled={saveMutation.isPending} className="gap-2 rounded-xl bg-gold font-bold text-navy hover:bg-gold-light">
@@ -118,6 +143,108 @@ export default function AdminPayment() {
       </div>
 
       <div className="max-w-3xl space-y-4">
+        <PaymentMethodCard
+          icon={Wallet}
+          title={isRTL ? 'بوابة دفع إلكترونية (وسيط)' : 'Payment gateway (aggregator)'}
+          description={isRTL ? 'مدى · فيزا · ماستركارد · Apple Pay · STC Pay عبر وسيط واحد' : 'mada · Visa · Mastercard · Apple Pay · STC Pay via one aggregator'}
+          enabled={form.gateway_enabled}
+          onToggle={(v) => set('gateway_enabled', v)}
+        >
+          <div className="space-y-4">
+            <div>
+              <Label className={`text-xs ${isRTL ? 'font-arabic' : 'font-english'}`}>{isRTL ? 'مزوّد الخدمة' : 'Provider'}</Label>
+              <Select value={form.gateway_provider || 'moyasar'} onValueChange={(v) => set('gateway_provider', v)}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="moyasar">Moyasar — ميسر ({isRTL ? 'نموذج مدمج' : 'embedded'})</SelectItem>
+                  <SelectItem value="tap">Tap Payments</SelectItem>
+                  <SelectItem value="hyperpay">HyperPay</SelectItem>
+                  <SelectItem value="paytabs">PayTabs</SelectItem>
+                  <SelectItem value="checkout">Checkout.com</SelectItem>
+                  <SelectItem value="stripe">Stripe</SelectItem>
+                  <SelectItem value="custom">{isRTL ? 'وسيط مخصّص (كود HTML)' : 'Custom (HTML embed)'}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {form.gateway_provider === 'moyasar' && (
+              <>
+                <div>
+                  <Label className={`text-xs ${isRTL ? 'font-arabic' : 'font-english'}`}>{isRTL ? 'مفتاح النشر (Publishable key)' : 'Publishable key'}</Label>
+                  <Input
+                    value={form.gateway_publishable_key}
+                    onChange={(e) => set('gateway_publishable_key', e.target.value)}
+                    placeholder="pk_live_xxxxxxxxxxxxxxxxxxxx"
+                    className="mt-1 font-english"
+                    dir="ltr"
+                    autoComplete="off"
+                  />
+                  <p className={`mt-1 text-[11px] text-muted-foreground ${isRTL ? 'font-arabic' : 'font-english'}`}>
+                    {isRTL
+                      ? 'من لوحة Moyasar ← الإعدادات ← مفاتيح API. استخدم مفتاح النشر فقط (pk_)، لا تضع المفتاح السري هنا.'
+                      : 'From Moyasar dashboard → Settings → API keys. Use the publishable key (pk_) only — never the secret key.'}
+                  </p>
+                </div>
+                <div>
+                  <Label className={`mb-2 block text-xs ${isRTL ? 'font-arabic' : 'font-english'}`}>{isRTL ? 'طرق الدفع المعروضة' : 'Methods shown'}</Label>
+                  <div className="space-y-2">
+                    <ToggleLine label={isRTL ? 'بطاقات (مدى/فيزا/ماستركارد)' : 'Cards (mada/Visa/Mastercard)'} checked={form.gateway_method_card !== false} onChange={(v) => set('gateway_method_card', v)} />
+                    <ToggleLine label="Apple Pay" checked={form.gateway_method_applepay !== false} onChange={(v) => set('gateway_method_applepay', v)} />
+                    <ToggleLine label="STC Pay" checked={!!form.gateway_method_stcpay} onChange={(v) => set('gateway_method_stcpay', v)} />
+                  </div>
+                  <p className={`mt-2 text-[11px] text-muted-foreground ${isRTL ? 'font-arabic' : 'font-english'}`}>
+                    {isRTL
+                      ? 'Apple Pay يتطلب تفعيل النطاق في لوحة Moyasar وجهازاً متوافقاً (Safari/iOS).'
+                      : 'Apple Pay requires domain activation in Moyasar and a compatible device (Safari/iOS).'}
+                  </p>
+                </div>
+              </>
+            )}
+
+            {LINK_PROVIDERS[form.gateway_provider] && (
+              <div>
+                <Label className={`text-xs ${isRTL ? 'font-arabic' : 'font-english'}`}>
+                  {isRTL ? `رابط الدفع المستضاف (${LINK_PROVIDERS[form.gateway_provider].name})` : `Hosted payment link (${LINK_PROVIDERS[form.gateway_provider].name})`}
+                </Label>
+                <Input
+                  value={form.gateway_payment_url}
+                  onChange={(e) => set('gateway_payment_url', e.target.value)}
+                  placeholder="https://..."
+                  className="mt-1 font-english"
+                  dir="ltr"
+                  autoComplete="off"
+                />
+                <p className={`mt-1 text-[11px] text-muted-foreground ${isRTL ? 'font-arabic' : 'font-english'}`}>
+                  {isRTL ? LINK_PROVIDERS[form.gateway_provider].help_ar : LINK_PROVIDERS[form.gateway_provider].help_en}
+                </p>
+                <p className={`mt-1 text-[11px] text-amber-500/80 ${isRTL ? 'font-arabic' : 'font-english'}`}>
+                  {isRTL
+                    ? 'ملاحظة: روابط الدفع غالباً بمبلغ ثابت. للمبالغ المتغيّرة حسب السلة يلزم باكند بسيط لإنشاء الجلسة.'
+                    : 'Note: payment links are usually fixed-amount. Dynamic cart totals need a small backend to create the session.'}
+                </p>
+              </div>
+            )}
+
+            {form.gateway_provider === 'custom' && (
+              <div>
+                <Label className={`text-xs ${isRTL ? 'font-arabic' : 'font-english'}`}>{isRTL ? 'كود نموذج الدفع من الوسيط (HTML)' : 'Aggregator hosted form HTML'}</Label>
+                <Textarea
+                  value={form.gateway_embed_html}
+                  onChange={(e) => set('gateway_embed_html', e.target.value)}
+                  placeholder={'<!-- Paste the hosted checkout / payment button HTML from your provider -->'}
+                  rows={8}
+                  className="mt-1 min-h-[140px] font-mono text-xs leading-relaxed"
+                  dir="ltr"
+                  spellCheck={false}
+                />
+                <p className={`mt-1 text-[11px] text-muted-foreground ${isRTL ? 'font-arabic' : 'font-english'}`}>
+                  {isRTL ? 'تُزال وسوم script تلقائياً للأمان؛ استخدم نماذج الدفع المستضافة (redirect/iframe).' : 'Script tags are stripped for safety; use hosted (redirect/iframe) forms.'}
+                </p>
+              </div>
+            )}
+          </div>
+        </PaymentMethodCard>
+
         <PaymentMethodCard
           icon={Globe}
           title="PayPal"
